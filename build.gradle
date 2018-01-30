@@ -39,7 +39,7 @@ repositories {
 }
 
 shadowJar  {
-    classifier = 'fat'
+    /*classifier = 'fat'*/
     /*manifest {
         attributes 'Main-Class': 'ApplicationMain'
     }*/

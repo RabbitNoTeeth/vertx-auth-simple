@@ -1,5 +1,6 @@
 package cn.booklish.vertx.simple.manager
 
+import cn.booklish.vertx.simple.constant.SimpleConstants
 import io.vertx.ext.auth.AuthProvider
 import io.vertx.ext.web.RoutingContext
 import cn.booklish.vertx.simple.core.Subject
@@ -30,9 +31,9 @@ object SecurityManager {
 
     fun getSubject(ctx:RoutingContext): Subject {
 
-        val rememberMeCookie = ctx.getCookie("simple-auth.RememberMe")
+        val rememberMeCookie = ctx.getCookie(SimpleConstants.REMEMBERME_COOKIE_KEY)
         if(rememberMeCookie == null){
-            val jSessionId = ctx.getCookie("simple-auth.JSESSIONID").value
+            val jSessionId = ctx.getCookie(SimpleConstants.JSESSIONID_COOKIE_KEY).value
             var subject = subjectMap[jSessionId]
             if(subject == null){
                 val newSubject = Subject(authProvider)

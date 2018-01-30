@@ -1,5 +1,6 @@
 package cn.booklish.vertx.simple.handler
 
+import cn.booklish.vertx.simple.constant.SimpleConstants
 import cn.booklish.vertx.simple.manager.SecurityManager
 import cn.booklish.vertx.simple.util.getUuid
 import cn.booklish.vertx.simple.provider.SimpleAuthProvider
@@ -30,11 +31,10 @@ class SimpleAuthHandlerImpl(simpleAuthProvider: SimpleAuthProvider): SimpleAuthH
      * 验证请求资源是否支持匿名访问
      */
     override fun checkAnno(permission: String): Boolean{
-        // todo 重写权限验证规则
-        return if(this.annoPermissionList.contains(permission)){
-            true
-        }else{
-            this.annoPermissionList.any { it.startsWith(permission,false) }
+        return when{
+            this.annoPermissionList.contains("*") -> true
+            this.annoPermissionList.contains(permission) -> true
+            else -> this.annoPermissionList.any { permission.startsWith(it.replace("*",""),false) }
         }
     }
 
@@ -42,10 +42,10 @@ class SimpleAuthHandlerImpl(simpleAuthProvider: SimpleAuthProvider): SimpleAuthH
      * 检查JSESSIONID cookie,如果请求中没有该cookie,则创建JSESSIONID cookie写入到响应中
      */
     override fun checkCookie(ctx: RoutingContext){
-        val jSessionIdCookie = ctx.getCookie("simple-auth.JSESSIONID")
+        val jSessionIdCookie = ctx.getCookie(SimpleConstants.JSESSIONID_COOKIE_KEY)
         if(jSessionIdCookie == null){
             val id = getUuid()
-            ctx.addCookie(Cookie.cookie("simple-auth.JSESSIONID",id).setHttpOnly(false).setPath("/"))
+            ctx.addCookie(Cookie.cookie(SimpleConstants.JSESSIONID_COOKIE_KEY,id).setHttpOnly(false).setPath("/"))
         }
     }
 

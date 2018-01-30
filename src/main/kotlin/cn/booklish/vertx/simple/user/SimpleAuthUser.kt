@@ -16,8 +16,11 @@ class SimpleAuthUser : AbstractUser() {
     private var principal:AtomicReference<JsonObject> = AtomicReference()
 
     override fun doIsPermitted(permission: String, resultHandler: Handler<AsyncResult<Boolean>>) {
-        // todo 重写权限验证规则
-        val status = this.cachedPermissions.any { permission.startsWith(it,false) }
+        val status = if(this.cachedPermissions.contains("*")){
+            true
+        }else{
+            this.cachedPermissions.any { permission.startsWith(it.replace("*",""),false) }
+        }
         resultHandler.handle(Future.succeededFuture(status))
     }
 

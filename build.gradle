@@ -1,0 +1,58 @@
+group 'cn.booklish.vertx'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'kotlin'
+apply plugin: 'java'
+
+
+buildscript {
+
+    ext.kotlin_version = '1.2.10'
+
+    repositories {
+        maven{
+            url "http://maven.aliyun.com/nexus/content/groups/public/"
+        }
+    }
+
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.3'
+    }
+}
+
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
+sourceCompatibility = 1.8
+
+repositories {
+    maven{
+        url "http://maven.aliyun.com/nexus/content/groups/public/"
+    }
+}
+
+shadowJar  {
+    classifier = 'fat'
+    /*manifest {
+        attributes 'Main-Class': 'ApplicationMain'
+    }*/
+}
+
+dependencies {
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    compile "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
+    compile 'io.vertx:vertx-web:3.4.2'
+    compile 'io.vertx:vertx-auth-common:3.2.1'
+}
+
+
+

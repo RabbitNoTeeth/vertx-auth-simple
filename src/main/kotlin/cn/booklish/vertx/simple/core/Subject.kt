@@ -44,7 +44,7 @@ class Subject(private val authProvider: AuthProvider) {
                     if(booleanType || stringType){
                         this.rememberMe.compareAndSet(false,true)
                         val cookieValue = Base64.getEncoder().encodeToString(authInfo.getString("username").toByteArray(Charsets.UTF_8))
-                        val cookie = Cookie.cookie("RememberMe",cookieValue).setHttpOnly(false).setPath("/")
+                        val cookie = Cookie.cookie("simple-auth.RememberMe",cookieValue).setHttpOnly(false).setPath("/")
                         ctx.addCookie(cookie)
                         SecurityManager.cacheRememberMeSubject(cookieValue,this)
                     }

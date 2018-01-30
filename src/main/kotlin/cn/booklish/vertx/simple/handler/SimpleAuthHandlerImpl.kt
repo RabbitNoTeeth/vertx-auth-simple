@@ -42,10 +42,10 @@ class SimpleAuthHandlerImpl(simpleAuthProvider: SimpleAuthProvider): SimpleAuthH
      * 检查JSESSIONID cookie,如果请求中没有该cookie,则创建JSESSIONID cookie写入到响应中
      */
     override fun checkCookie(ctx: RoutingContext){
-        val jSessionIdCookie = ctx.getCookie("JSESSIONID")
+        val jSessionIdCookie = ctx.getCookie("simple-auth.JSESSIONID")
         if(jSessionIdCookie == null){
             val id = getUuid()
-            ctx.addCookie(Cookie.cookie("JSESSIONID",id).setHttpOnly(false).setPath("/"))
+            ctx.addCookie(Cookie.cookie("simple-auth.JSESSIONID",id).setHttpOnly(false).setPath("/"))
         }
     }
 

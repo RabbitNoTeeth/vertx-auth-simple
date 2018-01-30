@@ -30,9 +30,9 @@ object SecurityManager {
 
     fun getSubject(ctx:RoutingContext): Subject {
 
-        val rememberMeCookie = ctx.getCookie("RememberMe")
+        val rememberMeCookie = ctx.getCookie("simple-auth.RememberMe")
         if(rememberMeCookie == null){
-            val jSessionId = ctx.getCookie("JSESSIONID").value
+            val jSessionId = ctx.getCookie("simple-auth.JSESSIONID").value
             var subject = subjectMap[jSessionId]
             if(subject == null){
                 val newSubject = Subject(authProvider)

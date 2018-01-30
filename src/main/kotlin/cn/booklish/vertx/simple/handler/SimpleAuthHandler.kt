@@ -16,4 +16,8 @@ interface SimpleAuthHandler: Handler<RoutingContext> {
 
     fun checkCookie(ctx: RoutingContext)
 
+    fun addAnnoPermissions(permissions:List<String>): SimpleAuthHandler
+
+    fun addAnnoPermission(permission:String): SimpleAuthHandler
+
 }

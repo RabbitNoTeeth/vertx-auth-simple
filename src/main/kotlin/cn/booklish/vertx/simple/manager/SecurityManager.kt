@@ -36,7 +36,7 @@ object SecurityManager {
             val jSessionId = ctx.getCookie(SimpleConstants.JSESSIONID_COOKIE_KEY).value
             var subject = subjectMap[jSessionId]
             if(subject == null){
-                val newSubject = Subject(authProvider)
+                val newSubject = Subject(authProvider,jSessionId)
                 if(subjectMap.putIfAbsent(jSessionId,newSubject) == null){
                     subject = newSubject
                 }
@@ -46,7 +46,7 @@ object SecurityManager {
             val rememberMe = rememberMeCookie.value
             var subject = rememberMeSubjectMap[rememberMe]
             if(subject == null){
-                val newSubject = Subject(authProvider)
+                val newSubject = Subject(authProvider,rememberMe)
                 if(rememberMeSubjectMap.putIfAbsent(rememberMe,newSubject) == null){
                     subject = newSubject
                 }

@@ -14,7 +14,7 @@ import java.util.*
 import java.util.concurrent.atomic.AtomicReference
 
 
-class Subject(private val authProvider: AuthProvider) {
+class Subject(private val authProvider: AuthProvider,val id:String) {
 
     private var authUser: AtomicReference<User> = AtomicReference()
 

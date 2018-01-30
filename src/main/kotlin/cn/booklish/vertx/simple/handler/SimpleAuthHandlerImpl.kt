@@ -22,8 +22,16 @@ class SimpleAuthHandlerImpl(simpleAuthProvider: SimpleAuthProvider): SimpleAuthH
     /**
      * 添加匿名访问许可
      */
-    fun addAnnoPermissions(permissions:MutableList<String>): SimpleAuthHandlerImpl {
+    override fun addAnnoPermissions(permissions:List<String>): SimpleAuthHandlerImpl {
         this.annoPermissionList.addAll(permissions)
+        return this
+    }
+
+    /**
+     * 添加匿名访问许可
+     */
+    override fun addAnnoPermission(permission:String): SimpleAuthHandlerImpl {
+        this.annoPermissionList.add(permission)
         return this
     }
 
@@ -45,7 +53,7 @@ class SimpleAuthHandlerImpl(simpleAuthProvider: SimpleAuthProvider): SimpleAuthH
         val jSessionIdCookie = ctx.getCookie(SimpleConstants.JSESSIONID_COOKIE_KEY)
         if(jSessionIdCookie == null){
             val id = getUuid()
-            ctx.addCookie(Cookie.cookie(SimpleConstants.JSESSIONID_COOKIE_KEY,id).setHttpOnly(false).setPath("/"))
+            ctx.addCookie(Cookie.cookie(SimpleConstants.JSESSIONID_COOKIE_KEY,id).setHttpOnly(true).setPath("/"))
         }
     }
 

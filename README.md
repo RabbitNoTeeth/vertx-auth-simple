@@ -83,8 +83,8 @@ val subject = ctx.get\<Subject\>(SimpleConstants.CTX_SUBJECT_KEY)
 
 <br>
 4.注意<br>
-在vertx-auth-simple中,访问权限的字符串形式为 请求方法:请求地址,如 GET:/articles/page <br>
-同时,vertx-auth-simple支持最后一位\*号匹配,如 GET:/article/123456 和 GET:/article/456789 分别表示请求不同的资源,那么可以通过 GET:/article/\* 或者 GET:/article 来同时匹配两者 <br>
+在vertx-auth-simple中,访问权限的字符串形式为 "请求方法:请求地址",如 "GET:/articles/page" <br>
+vertx-auth-simple支持最后一位*号匹配,如 GET:/article/123456 和 GET:/article/456789 分别表示请求不同的资源,那么可以通过 GET:/article/* 或者 GET:/article 来同时匹配两者 <br>
 单纯一个*号表示匹配所有访问<br>
 
 

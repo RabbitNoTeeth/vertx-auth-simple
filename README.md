@@ -60,12 +60,12 @@ class SimpleAuthProviderImpl(private val mongoClient: MongoClient): SimpleAuthPr
 2.配置router
 
 <pre><code>
-    // 定义不需要拦截的访问
-    val annoPermissions = listOf("GET:/articles/page","GET:/articleClassifies/tree")
-    // 创建实现类
-    val simpleAuthProviderImpl = SimpleAuthProviderImpl(mongoClient.mongo)
-    // 注册权限处理器
-    router.route().handler(SimpleAuthHandler.create(simpleAuthProviderImpl).addAnnoPermissions(annoPermissions))
+// 定义不需要拦截的访问
+val annoPermissions = listOf("GET:/articles/page","GET:/articleClassifies/tree")
+// 创建实现类
+val simpleAuthProviderImpl = SimpleAuthProviderImpl(mongoClient.mongo)
+// 注册权限处理器
+router.route().handler(SimpleAuthHandler.create(simpleAuthProviderImpl).addAnnoPermissions(annoPermissions))
 </code></pre>
 
 3.注意<br>

@@ -57,25 +57,31 @@ class SimpleAuthProviderImpl(private val mongoClient: MongoClient): SimpleAuthPr
 
 </code></pre>
 
+<br>
 2.配置router
 
 <pre><code>
 // 定义不需要拦截的访问
 val annoPermissions = listOf("GET:/articles/page","GET:/articleClassifies/tree")
+
 // 创建实现类
 val simpleAuthProviderImpl = SimpleAuthProviderImpl(mongoClient.mongo)
+
 // 注册权限处理器
 router.route().handler(SimpleAuthHandler.create(simpleAuthProviderImpl).addAnnoPermissions(annoPermissions))
 </code></pre>
 
+<br>
 3.获取Subject实体<br>
 <pre><code>
 // 方式一:直接从管理器中获取
 val subject = SecurityManager.getSubject(ctx)
+
 // 方式二:从RoterContext上下文中获取(SimpleAuthHandler会在拦截请求后将当前会话的subject放到RoterContext上下文中)
-val subject = ctx.get<Subject>(SimpleConstants.CTX_SUBJECT_KEY)
+val subject = ctx.get\<Subject\>(SimpleConstants.CTX_SUBJECT_KEY)
 </code></pre>
 
+<br>
 4.注意<br>
 在vertx-auth-simple中,访问权限的字符串形式为 请求方法:请求地址,如 GET:/articles/page <br>
 同时,vertx-auth-simple支持最后一位\*号匹配,如 GET:/article/123456 和 GET:/article/456789 分别表示请求不同的资源,那么可以通过 GET:/article/\* 或者 GET:/article 来同时匹配两者 <br>

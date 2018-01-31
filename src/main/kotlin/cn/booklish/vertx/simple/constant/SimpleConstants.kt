@@ -3,8 +3,12 @@ package cn.booklish.vertx.simple.constant
 
 object SimpleConstants {
 
-    val JSESSIONID_COOKIE_KEY = "simple-auth.JSESSIONID"
+    val COOKIE_JSESSIONID_KEY = "simple-auth.JSESSIONID"
 
-    val REMEMBERME_COOKIE_KEY = "simple-auth.RememberMe"
+    val COOKIE_REMEMBERME_KEY = "simple-auth.RememberMe"
+
+    val CTX_SUBJECT_KEY = "simple-auth.SUBJECT"
+
+    val CTX_START_TIME_KEY = "simple-auth.START_TIME"
 
 }

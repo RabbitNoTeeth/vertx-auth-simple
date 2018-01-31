@@ -50,10 +50,10 @@ class SimpleAuthHandlerImpl(simpleAuthProvider: SimpleAuthProvider): SimpleAuthH
      * 检查JSESSIONID cookie,如果请求中没有该cookie,则创建JSESSIONID cookie写入到响应中
      */
     override fun checkCookie(ctx: RoutingContext){
-        val jSessionIdCookie = ctx.getCookie(SimpleConstants.JSESSIONID_COOKIE_KEY)
+        val jSessionIdCookie = ctx.getCookie(SimpleConstants.COOKIE_JSESSIONID_KEY)
         if(jSessionIdCookie == null){
             val id = getUuid()
-            ctx.addCookie(Cookie.cookie(SimpleConstants.JSESSIONID_COOKIE_KEY,id).setHttpOnly(true).setPath("/"))
+            ctx.addCookie(Cookie.cookie(SimpleConstants.COOKIE_JSESSIONID_KEY,id).setHttpOnly(true).setPath("/"))
         }
     }
 
@@ -72,7 +72,8 @@ class SimpleAuthHandlerImpl(simpleAuthProvider: SimpleAuthProvider): SimpleAuthH
 
         if(method == HttpMethod.OPTIONS || checkAnno(permission)){
             //将当前用户信息放入router上下文中,便于子路由获取.(此时用户可能未登录,也可能已登录)
-            ctx.put("subject",subject)
+            ctx.put(SimpleConstants.CTX_SUBJECT_KEY,subject)
+            ctx.put(SimpleConstants.CTX_START_TIME_KEY,System.nanoTime())
             ctx.next()
         }else{
             if(subject.isAuthenticated()){

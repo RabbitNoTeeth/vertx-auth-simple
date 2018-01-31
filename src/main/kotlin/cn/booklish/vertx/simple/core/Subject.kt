@@ -45,7 +45,7 @@ class Subject(private val authProvider: AuthProvider,val id:String) {
                     if(booleanType || stringType){
                         this.rememberMe.compareAndSet(false,true)
                         val cookieValue = Base64.getEncoder().encodeToString(authInfo.getString("username").toByteArray(Charsets.UTF_8))
-                        val cookie = Cookie.cookie(SimpleConstants.REMEMBERME_COOKIE_KEY,cookieValue).setHttpOnly(false).setPath("/")
+                        val cookie = Cookie.cookie(SimpleConstants.COOKIE_REMEMBERME_KEY,cookieValue).setHttpOnly(false).setPath("/")
                         ctx.addCookie(cookie)
                         SecurityManager.cacheRememberMeSubject(cookieValue,this)
                     }
@@ -76,8 +76,8 @@ class Subject(private val authProvider: AuthProvider,val id:String) {
         return this.rememberMe.get()
     }
 
-    fun getPrincipal():JsonObject{
-        return this.getUser()?.principal()?: JsonObject()
+    fun getPrincipal():JsonObject? {
+        return this.getUser()?.principal()
     }
 
 }

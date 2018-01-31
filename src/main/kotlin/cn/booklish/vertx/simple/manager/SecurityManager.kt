@@ -31,9 +31,9 @@ object SecurityManager {
 
     fun getSubject(ctx:RoutingContext): Subject {
 
-        val rememberMeCookie = ctx.getCookie(SimpleConstants.REMEMBERME_COOKIE_KEY)
+        val rememberMeCookie = ctx.getCookie(SimpleConstants.COOKIE_REMEMBERME_KEY)
         if(rememberMeCookie == null){
-            val jSessionId = ctx.getCookie(SimpleConstants.JSESSIONID_COOKIE_KEY).value
+            val jSessionId = ctx.getCookie(SimpleConstants.COOKIE_JSESSIONID_KEY).value
             var subject = subjectMap[jSessionId]
             if(subject == null){
                 val newSubject = Subject(authProvider,jSessionId)

@@ -1,9 +1,9 @@
-package cn.booklish.vertx.simple.handler
+package cn.booklish.vertx.auth.simple.handler
 
-import cn.booklish.vertx.simple.constant.SimpleConstants
-import cn.booklish.vertx.simple.manager.SecurityManager
-import cn.booklish.vertx.simple.util.getUuid
-import cn.booklish.vertx.simple.provider.SimpleAuthProvider
+import cn.booklish.vertx.auth.simple.constant.SimpleConstants
+import cn.booklish.vertx.auth.simple.manager.SecurityManager
+import cn.booklish.vertx.auth.simple.util.getUuid
+import cn.booklish.vertx.auth.simple.provider.SimpleAuthProvider
 import io.vertx.core.Handler
 import io.vertx.core.http.HttpMethod
 import io.vertx.ext.web.Cookie

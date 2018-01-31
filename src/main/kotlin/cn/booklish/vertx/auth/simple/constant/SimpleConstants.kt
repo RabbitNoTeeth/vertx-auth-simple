@@ -1,4 +1,4 @@
-package cn.booklish.vertx.simple.constant
+package cn.booklish.vertx.auth.simple.constant
 
 
 object SimpleConstants {

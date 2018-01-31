@@ -1,4 +1,4 @@
-package cn.booklish.vertx.simple.user
+package cn.booklish.vertx.auth.simple.user
 
 import io.vertx.core.AsyncResult
 import io.vertx.core.Future

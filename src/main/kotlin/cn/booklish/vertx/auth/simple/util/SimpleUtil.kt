@@ -1,4 +1,4 @@
-package cn.booklish.vertx.simple.util
+package cn.booklish.vertx.auth.simple.util
 
 import java.util.*
 

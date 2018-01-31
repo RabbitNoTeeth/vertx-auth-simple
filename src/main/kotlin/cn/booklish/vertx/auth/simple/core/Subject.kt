@@ -1,7 +1,7 @@
-package cn.booklish.vertx.simple.core
+package cn.booklish.vertx.auth.simple.core
 
-import cn.booklish.vertx.simple.constant.SimpleConstants
-import cn.booklish.vertx.simple.manager.SecurityManager
+import cn.booklish.vertx.auth.simple.constant.SimpleConstants
+import cn.booklish.vertx.auth.simple.manager.SecurityManager
 import io.vertx.core.AsyncResult
 import io.vertx.core.Future
 import io.vertx.core.Handler

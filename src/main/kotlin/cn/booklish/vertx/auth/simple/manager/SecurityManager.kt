@@ -1,9 +1,9 @@
-package cn.booklish.vertx.simple.manager
+package cn.booklish.vertx.auth.simple.manager
 
-import cn.booklish.vertx.simple.constant.SimpleConstants
+import cn.booklish.vertx.auth.simple.constant.SimpleConstants
 import io.vertx.ext.auth.AuthProvider
 import io.vertx.ext.web.RoutingContext
-import cn.booklish.vertx.simple.core.Subject
+import cn.booklish.vertx.auth.simple.core.Subject
 import java.util.concurrent.ConcurrentHashMap
 
 

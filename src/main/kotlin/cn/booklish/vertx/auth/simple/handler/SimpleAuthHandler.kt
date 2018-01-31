@@ -1,6 +1,6 @@
-package cn.booklish.vertx.simple.handler
+package cn.booklish.vertx.auth.simple.handler
 
-import cn.booklish.vertx.simple.provider.SimpleAuthProvider
+import cn.booklish.vertx.auth.simple.provider.SimpleAuthProvider
 import io.vertx.core.Handler
 import io.vertx.ext.web.RoutingContext
 

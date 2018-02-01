@@ -10,7 +10,7 @@ import io.vertx.ext.web.Cookie
 import io.vertx.ext.web.RoutingContext
 
 
-class SimpleAuthHandlerImpl(simpleAuthProvider: SimpleAuthProvider): SimpleAuthHandler {
+class SimpleAuthHandlerImpl(simpleAuthProvider: SimpleAuthProvider): SimpleAuthHandler{
 
     private val annoPermissionList = mutableListOf<String>()
 

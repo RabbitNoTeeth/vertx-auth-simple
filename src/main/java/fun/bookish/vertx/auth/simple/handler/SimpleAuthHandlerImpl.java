@@ -34,7 +34,7 @@ public class SimpleAuthHandlerImpl implements SimpleAuthHandler{
     @Override
     public boolean checkAnno(String permission) {
         return this.annoPermissionList.contains("*") || this.annoPermissionList.contains(permission) ||
-                this.annoPermissionList.stream().anyMatch(per -> per.startsWith(permission.replace("*", "")));
+                this.annoPermissionList.stream().anyMatch(per -> permission.startsWith(per.replaceAll("\\*", "")));
     }
 
     /**

@@ -22,7 +22,7 @@ public class SimpleAuthUser extends AbstractUser {
     @Override
     protected void doIsPermitted(String permission, Handler<AsyncResult<Boolean>> resultHandler) {
         boolean access = this.cachedPermissions.contains("*") ||
-                this.cachedPermissions.stream().anyMatch(per -> per.startsWith(permission.replace("*", "")));
+                this.cachedPermissions.stream().anyMatch(per -> permission.startsWith(per.replaceAll("\\*", "")));
         resultHandler.handle(Future.succeededFuture(access));
     }
 

@@ -75,15 +75,12 @@ public class SimpleAuthHandlerImpl implements SimpleAuthHandler{
         //拼接权限字符串
         String permission = method.name()+":"+ctx.request().path();
 
-        //获取当前用户
-        Subject subject = SecurityManager.getSubject(ctx);
-
         if(method == HttpMethod.OPTIONS || checkAnno(permission)){
-            //将当前用户信息放入router上下文中,便于子路由获取.(此时用户可能未登录,也可能已登录)
-            ctx.put(SimpleConstants.CTX_SUBJECT_KEY,subject);
             ctx.put(SimpleConstants.CTX_START_TIME_KEY,System.nanoTime());
             ctx.next();
         }else{
+            //获取当前用户
+            Subject subject = SecurityManager.getSubject(ctx);
             if(subject.isAuthenticated()){
                 subject.isAuthorised(permission, res -> {
                     if(res.succeeded() && res.result()){

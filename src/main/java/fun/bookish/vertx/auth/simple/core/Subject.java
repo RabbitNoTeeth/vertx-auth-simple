@@ -52,7 +52,7 @@ public class Subject {
                     if(rememberMe.equals(true) || rememberMe.toString().equals("true")){
                         this.rememberMeRef.compareAndSet(false,true);
                         String cookieValue = Base64.getEncoder().encodeToString(authInfo.getString("username").getBytes(Charset.forName("UTF-8")));
-                        Cookie cookie = Cookie.cookie(SimpleConstants.COOKIE_REMEMBERME_KEY,cookieValue).setHttpOnly(false).setPath("/");
+                        Cookie cookie = Cookie.cookie(SimpleConstants.COOKIE_REMEMBERME_KEY,cookieValue).setHttpOnly(false).setPath("/").setMaxAge(1296000);
                         ctx.addCookie(cookie);
                         SecurityManager.cacheRememberMeSubject(cookieValue,this);
                     }

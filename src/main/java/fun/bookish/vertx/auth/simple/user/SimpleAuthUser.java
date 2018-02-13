@@ -1,5 +1,6 @@
 package fun.bookish.vertx.auth.simple.user;
 
+import fun.bookish.vertx.auth.simple.constant.SimpleConstants;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -7,7 +8,9 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.AbstractUser;
 import io.vertx.ext.auth.AuthProvider;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -15,9 +18,15 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class SimpleAuthUser extends AbstractUser {
 
-    private static final AtomicReference<AuthProvider> authProviderRef = new AtomicReference<>();
+    public SimpleAuthUser(){}
 
-    private static final AtomicReference<JsonObject> principalRef = new AtomicReference<>();
+    public SimpleAuthUser(JsonObject principal){
+        this.principal = principal;
+        String[] permissions = principal.getString(SimpleConstants.PRINCIPAL_PERMISSION_KEY).split(";");
+        this.cachedPermissions.addAll(Arrays.asList(permissions));
+    }
+
+    private volatile JsonObject principal;
 
     @Override
     protected void doIsPermitted(String permission, Handler<AsyncResult<Boolean>> resultHandler) {
@@ -28,16 +37,14 @@ public class SimpleAuthUser extends AbstractUser {
 
     @Override
     public JsonObject principal() {
-        return principalRef.get();
+        return this.principal;
     }
 
     @Override
-    public void setAuthProvider(AuthProvider authProvider) {
-        authProviderRef.compareAndSet(null,authProvider);
-    }
+    public void setAuthProvider(AuthProvider authProvider) { }
 
     public void setPrincipal(JsonObject principal){
-        principalRef.compareAndSet(null,principal);
+        this.principal = principal;
     }
 
     public void  appendPermission(String permission){

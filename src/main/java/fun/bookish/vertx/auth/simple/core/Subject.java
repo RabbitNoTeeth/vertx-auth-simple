@@ -1,39 +1,45 @@
 package fun.bookish.vertx.auth.simple.core;
 
+import fun.bookish.vertx.auth.simple.constant.SimpleConfigConstants;
 import fun.bookish.vertx.auth.simple.constant.SimpleConstants;
+import fun.bookish.vertx.auth.simple.encryption.SimpleEncryptMode;
+import fun.bookish.vertx.auth.simple.encryption.SimpleEncryption;
 import fun.bookish.vertx.auth.simple.manager.SecurityManager;
+import fun.bookish.vertx.auth.simple.provider.SimpleAuthProvider;
+import fun.bookish.vertx.auth.simple.user.SimpleAuthUser;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.auth.AuthProvider;
 import io.vertx.ext.auth.User;
 import io.vertx.ext.web.Cookie;
 import io.vertx.ext.web.RoutingContext;
 
-import java.nio.charset.Charset;
-import java.util.Base64;
-import java.util.concurrent.atomic.AtomicReference;
+import java.time.LocalDateTime;
 
 /**
  *
  */
 public class Subject {
 
-    private final String id;
-    private final AuthProvider authProvider;
+    public final LocalDateTime time = LocalDateTime.now();
 
-    public Subject(String id,AuthProvider authProvider){
-        this.id = id;
+    private final SimpleAuthProvider authProvider;
+    private final SimpleEncryption encryption;
+    private final JsonObject config;
+
+    public Subject(SimpleAuthProvider authProvider,SimpleEncryption encryption,JsonObject config){
         this.authProvider = authProvider;
+        this.encryption = encryption;
+        this.config = config;
     }
 
-    private final AtomicReference<User> authUserRef = new AtomicReference<>();
+    private volatile User authUser;
 
-    private final AtomicReference<Boolean> rememberMeRef = new AtomicReference<>(false);
+    private volatile boolean rememberMe;
 
-    private void setUser(User user){
-        this.authUserRef.compareAndSet(null,user);
+    public void setUser(User user){
+        this.authUser = user;
     }
 
     /**
@@ -45,18 +51,26 @@ public class Subject {
     public void login(RoutingContext ctx, JsonObject authInfo, Handler<AsyncResult<Void>> resultHandler){
         authProvider.authenticate(authInfo,res -> {
             if(res.succeeded()){
-                this.setUser(res.result());
+
+                SimpleAuthUser user = res.result();
+                this.setUser(user);
+
                 //判断rememberMe
-                Object rememberMe = authInfo.getValue("RememberMe");
+                Object rememberMe = authInfo.getValue(SimpleConstants.AUTH_REMEMBERME_KEY);
                 if(rememberMe != null){
                     if(rememberMe.equals(true) || rememberMe.toString().equals("true")){
-                        this.rememberMeRef.compareAndSet(false,true);
-                        String cookieValue = Base64.getEncoder().encodeToString(authInfo.getString("username").getBytes(Charset.forName("UTF-8")));
-                        Cookie cookie = Cookie.cookie(SimpleConstants.COOKIE_REMEMBERME_KEY,cookieValue).setHttpOnly(false).setPath("/").setMaxAge(1296000);
+                        this.rememberMe = true;
+                        //对user中的principle进行加密
+                        String cookieValue = this.encryption.encryptOrDecrypt(user.principal().toString(),SimpleConstants.DEFAULT_AES_KEY
+                                , SimpleEncryptMode.ENCRYPT);
+                        //创建rememberMe cookie，并写入到response中
+                        Cookie cookie = Cookie.cookie(SimpleConstants.COOKIE_REMEMBERME_KEY,cookieValue)
+                                .setMaxAge(this.config.getInteger(SimpleConfigConstants.REMEMBERME_TIMEOUT))
+                                .setHttpOnly(false).setPath("/");
                         ctx.addCookie(cookie);
-                        SecurityManager.cacheRememberMeSubject(cookieValue,this);
                     }
                 }
+
                 resultHandler.handle(Future.succeededFuture());
             }else{
                 resultHandler.handle(Future.failedFuture(res.cause()));
@@ -70,8 +84,7 @@ public class Subject {
      * @param resultHandler
      */
     public void isAuthorised(String authority, Handler<AsyncResult<Boolean>> resultHandler){
-        User authUser = this.authUserRef.get();
-        if(authUser == null){
+        if(this.authUser == null){
             resultHandler.handle(Future.succeededFuture(false));
         }else{
             authUser.isAuthorised(authority, resultHandler);
@@ -81,25 +94,31 @@ public class Subject {
     /**
      * 用户注销
      */
-    public void logout(){
-        this.authUserRef.set(null);
-        this.rememberMeRef.set(false);
+    public void logout(RoutingContext ctx){
+        this.authUser = null;
+        this.rememberMe = false;
+        SecurityManager securityManager = ctx.vertx().getOrCreateContext().get(SimpleConstants.VERTX_CTX_SECURITY_MANAGER_KEY);
+        securityManager.remove(ctx);
     }
 
     public boolean isAuthenticated(){
-        return this.authUserRef.get() != null;
+        return this.authUser != null;
     }
 
     public User getUser(){
-        return this.authUserRef.get();
+        return this.authUser;
     }
 
     public boolean isRememberMe(){
-        return this.rememberMeRef.get();
+        return this.rememberMe;
+    }
+
+    public Subject setRememberMe(){
+        this.rememberMe = true;
+        return this;
     }
 
     public JsonObject getPrincipal() {
-        User user = this.getUser();
-        return user==null?null:user.principal();
+        return this.authUser==null?null : this.authUser.principal();
     }
 }

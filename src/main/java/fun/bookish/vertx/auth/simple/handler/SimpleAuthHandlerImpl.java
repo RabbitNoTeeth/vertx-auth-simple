@@ -15,8 +15,10 @@ import io.vertx.ext.web.Cookie;
 import io.vertx.ext.web.RoutingContext;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Don9
@@ -63,15 +65,15 @@ public class SimpleAuthHandlerImpl implements SimpleAuthHandler{
 
     }
 
-    private final List<String> annoPermissionList = new ArrayList<>();
+    private final Set<String> annoPermissionSet = new HashSet<>();
 
     /**
      * 验证请求资源是否支持匿名访问
      */
     @Override
     public boolean checkAnno(String permission) {
-        return this.annoPermissionList.contains("*") || this.annoPermissionList.contains(permission) ||
-                this.annoPermissionList.stream().anyMatch(per -> permission.startsWith(per.replaceAll("\\*", "")));
+        return this.annoPermissionSet.contains("*") || this.annoPermissionSet.contains(permission) ||
+                this.annoPermissionSet.stream().anyMatch(per -> permission.startsWith(per.replaceAll("\\*", "")));
     }
 
     /**
@@ -88,8 +90,8 @@ public class SimpleAuthHandlerImpl implements SimpleAuthHandler{
      * 添加匿名访问许可
      */
     @Override
-    public SimpleAuthHandler addAnnoPermissions(List<String> permissions) {
-        this.annoPermissionList.addAll(permissions);
+    public SimpleAuthHandler addAnnoPermissions(Collection<String> permissions) {
+        this.annoPermissionSet.addAll(permissions);
         return this;
     }
 
@@ -98,7 +100,7 @@ public class SimpleAuthHandlerImpl implements SimpleAuthHandler{
      */
     @Override
     public SimpleAuthHandler addAnnoPermission(String permission) {
-        this.annoPermissionList.add(permission);
+        this.annoPermissionSet.add(permission);
         return this;
     }
 

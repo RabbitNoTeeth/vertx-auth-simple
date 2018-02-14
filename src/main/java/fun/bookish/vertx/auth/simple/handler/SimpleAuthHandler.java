@@ -7,6 +7,7 @@ import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface SimpleAuthHandler extends Handler<RoutingContext> {
@@ -23,7 +24,7 @@ public interface SimpleAuthHandler extends Handler<RoutingContext> {
 
     void checkCookie(RoutingContext ctx);
 
-    SimpleAuthHandler addAnnoPermissions(List<String> permissions);
+    SimpleAuthHandler addAnnoPermissions(Collection<String> permissions);
 
     SimpleAuthHandler addAnnoPermission(String permission);
 }

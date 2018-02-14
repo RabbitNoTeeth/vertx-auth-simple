@@ -25,11 +25,13 @@ public class Subject {
     public final LocalDateTime time = LocalDateTime.now();
 
     private final SimpleAuthProvider authProvider;
+    private final SecurityManager securityManager;
     private final SimpleEncryption encryption;
     private final JsonObject config;
 
-    public Subject(SimpleAuthProvider authProvider,SimpleEncryption encryption,JsonObject config){
+    public Subject(SimpleAuthProvider authProvider,SecurityManager securityManager,SimpleEncryption encryption,JsonObject config){
         this.authProvider = authProvider;
+        this.securityManager = securityManager;
         this.encryption = encryption;
         this.config = config;
     }
@@ -37,10 +39,6 @@ public class Subject {
     private volatile User authUser;
 
     private volatile boolean rememberMe;
-
-    public void setUser(User user){
-        this.authUser = user;
-    }
 
     /**
      * 用户登录
@@ -52,8 +50,8 @@ public class Subject {
         authProvider.authenticate(authInfo,res -> {
             if(res.succeeded()){
 
-                SimpleAuthUser user = res.result();
-                this.setUser(user);
+                User user = res.result();
+                this.authUser = user;
 
                 //判断rememberMe
                 Object rememberMe = authInfo.getValue(SimpleConstants.AUTH_REMEMBERME_KEY);
@@ -68,6 +66,7 @@ public class Subject {
                                 .setMaxAge(this.config.getInteger(SimpleConfigConstants.REMEMBERME_TIMEOUT))
                                 .setHttpOnly(false).setPath("/");
                         ctx.addCookie(cookie);
+                        this.securityManager.cacheRememberMe(cookieValue,this);
                     }
                 }
 

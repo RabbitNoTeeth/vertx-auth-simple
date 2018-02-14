@@ -23,8 +23,8 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class SecurityManager {
 
-    private static final ConcurrentHashMap<String, Subject> subjectCache = new ConcurrentHashMap<>();
-    private static final ConcurrentHashMap<String, Subject> rememberMeCache = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Subject> subjectCache = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, Subject> rememberMeCache = new ConcurrentHashMap<>();
 
     private final Vertx vertx;
     private final SimpleAuthProvider authProvider;

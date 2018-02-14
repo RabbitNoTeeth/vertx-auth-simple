@@ -10,8 +10,6 @@ import io.vertx.ext.auth.AuthProvider;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * io.vertx.ext.auth.User接口实现

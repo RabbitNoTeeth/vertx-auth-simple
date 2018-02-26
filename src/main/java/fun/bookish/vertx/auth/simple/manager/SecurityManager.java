@@ -5,6 +5,7 @@ import fun.bookish.vertx.auth.simple.constant.SimpleConstants;
 import fun.bookish.vertx.auth.simple.core.Subject;
 import fun.bookish.vertx.auth.simple.encryption.SimpleEncryptMode;
 import fun.bookish.vertx.auth.simple.encryption.SimpleEncryption;
+import fun.bookish.vertx.auth.simple.ext.PermissionStrategy;
 import fun.bookish.vertx.auth.simple.provider.SimpleAuthProvider;
 import fun.bookish.vertx.auth.simple.user.SimpleAuthUser;
 import io.vertx.core.Vertx;
@@ -37,7 +38,6 @@ public class SecurityManager {
         this.encryption = encryption;
         this.config = config;
         startPeriodicClear();
-
     }
 
     /**
@@ -107,7 +107,7 @@ public class SecurityManager {
         String jSessionId = ctx.getCookie(SimpleConstants.COOKIE_JSESSIONID_KEY).getValue();
         Subject subject = subjectCache.get(jSessionId);
         if(subject == null){
-            Subject newSubject = new Subject(authProvider,this,this.encryption,this.config);
+            Subject newSubject = new Subject(this.vertx,authProvider,this,this.encryption,this.config);
             if(subjectCache.putIfAbsent(jSessionId,newSubject) == null){
                 subject = newSubject;
             }else{

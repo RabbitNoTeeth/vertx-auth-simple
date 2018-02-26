@@ -5,6 +5,8 @@ import fun.bookish.vertx.auth.simple.constant.SimpleConstants;
 import fun.bookish.vertx.auth.simple.core.Subject;
 import fun.bookish.vertx.auth.simple.encryption.DefaultAESEncryption;
 import fun.bookish.vertx.auth.simple.encryption.SimpleEncryption;
+import fun.bookish.vertx.auth.simple.ext.PermissionStrategyImpl;
+import fun.bookish.vertx.auth.simple.ext.PermissionStrategy;
 import fun.bookish.vertx.auth.simple.manager.SecurityManager;
 import fun.bookish.vertx.auth.simple.provider.SimpleAuthProvider;
 import fun.bookish.vertx.auth.simple.util.SimpleUtils;
@@ -17,7 +19,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -32,8 +33,9 @@ public class SimpleAuthHandlerImpl implements SimpleAuthHandler{
     private final JsonObject config;
     private final SecurityManager securityManager;
     private final SimpleEncryption encryption;
+    private final PermissionStrategy permissionStrategy;
 
-    SimpleAuthHandlerImpl(Vertx vertx, SimpleAuthProvider simpleAuthProvider, JsonObject config){
+    SimpleAuthHandlerImpl(Vertx vertx, SimpleAuthProvider simpleAuthProvider, PermissionStrategy permissionStrategy, JsonObject config){
         this.vertx = vertx;
         this.simpleAuthProvider = simpleAuthProvider;
         this.encryption = new DefaultAESEncryption();
@@ -41,6 +43,7 @@ public class SimpleAuthHandlerImpl implements SimpleAuthHandler{
         this.config = config;
         this.securityManager = new SecurityManager(vertx,simpleAuthProvider,this.encryption,config);
         vertx.getOrCreateContext().put(SimpleConstants.VERTX_CTX_SECURITY_MANAGER_KEY,this.securityManager);
+        this.permissionStrategy = permissionStrategy==null? new PermissionStrategyImpl() : permissionStrategy;
     }
 
     private void handleConfig(JsonObject config) {
@@ -113,7 +116,7 @@ public class SimpleAuthHandlerImpl implements SimpleAuthHandler{
         HttpMethod method = ctx.request().method();
 
         //拼接权限字符串
-        String permission = method.name()+":"+ctx.request().path();
+        String permission = this.permissionStrategy.create(ctx.request());
 
         if(method == HttpMethod.OPTIONS || checkAnno(permission)){
             ctx.put(SimpleConstants.ROUTER_CTX_START_TIME_KEY,System.nanoTime());

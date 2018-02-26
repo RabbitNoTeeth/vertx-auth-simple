@@ -4,12 +4,14 @@ import fun.bookish.vertx.auth.simple.constant.SimpleConfigConstants;
 import fun.bookish.vertx.auth.simple.constant.SimpleConstants;
 import fun.bookish.vertx.auth.simple.encryption.SimpleEncryptMode;
 import fun.bookish.vertx.auth.simple.encryption.SimpleEncryption;
+import fun.bookish.vertx.auth.simple.ext.PermissionStrategy;
 import fun.bookish.vertx.auth.simple.manager.SecurityManager;
 import fun.bookish.vertx.auth.simple.provider.SimpleAuthProvider;
 import fun.bookish.vertx.auth.simple.user.SimpleAuthUser;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.User;
 import io.vertx.ext.web.Cookie;
@@ -24,12 +26,14 @@ public class Subject {
 
     public final LocalDateTime time = LocalDateTime.now();
 
+    private final Vertx vertx;
     private final SimpleAuthProvider authProvider;
     private final SecurityManager securityManager;
     private final SimpleEncryption encryption;
     private final JsonObject config;
 
-    public Subject(SimpleAuthProvider authProvider,SecurityManager securityManager,SimpleEncryption encryption,JsonObject config){
+    public Subject(Vertx vertx,SimpleAuthProvider authProvider,SecurityManager securityManager,SimpleEncryption encryption,JsonObject config){
+        this.vertx = vertx;
         this.authProvider = authProvider;
         this.securityManager = securityManager;
         this.encryption = encryption;
@@ -47,7 +51,7 @@ public class Subject {
      * @param resultHandler
      */
     public void login(RoutingContext ctx, JsonObject authInfo, Handler<AsyncResult<Void>> resultHandler){
-        authProvider.authenticate(authInfo,res -> {
+        this.vertx.executeBlocking(future -> authProvider.authenticate(authInfo, res -> {
             if(res.succeeded()){
 
                 User user = res.result();
@@ -70,11 +74,11 @@ public class Subject {
                     }
                 }
 
-                resultHandler.handle(Future.succeededFuture());
+                future.complete();
             }else{
-                resultHandler.handle(Future.failedFuture(res.cause()));
+                future.fail(res.cause());
             }
-        });
+        }),resultHandler);
     }
 
     /**
@@ -86,7 +90,7 @@ public class Subject {
         if(this.authUser == null){
             resultHandler.handle(Future.succeededFuture(false));
         }else{
-            authUser.isAuthorised(authority, resultHandler);
+            authUser.isAuthorized(authority, resultHandler);
         }
     }
 

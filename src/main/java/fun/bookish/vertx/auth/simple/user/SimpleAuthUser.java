@@ -1,6 +1,7 @@
 package fun.bookish.vertx.auth.simple.user;
 
 import fun.bookish.vertx.auth.simple.constant.SimpleConstants;
+import fun.bookish.vertx.auth.simple.ext.PermissionCreateStrategy;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -10,11 +11,15 @@ import io.vertx.ext.auth.AuthProvider;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * io.vertx.ext.auth.User接口实现
  */
 public class SimpleAuthUser extends AbstractUser {
+
+    private final Set<PermissionCreateStrategy> cachedExtPermissionCreateStrategies = new HashSet<>();
 
     public SimpleAuthUser(){}
 

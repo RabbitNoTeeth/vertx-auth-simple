@@ -90,7 +90,7 @@ public class Subject {
         if(this.authUser == null){
             resultHandler.handle(Future.succeededFuture(false));
         }else{
-            authUser.isAuthorized(authority, resultHandler);
+            authUser.isAuthorised(authority, resultHandler);
         }
     }
 

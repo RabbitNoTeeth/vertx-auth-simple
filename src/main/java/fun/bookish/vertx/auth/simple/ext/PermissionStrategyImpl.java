@@ -7,10 +7,12 @@ import io.vertx.core.http.HttpServerRequest;
  **/
 public class PermissionStrategyImpl implements PermissionStrategy {
 
+    @Override
     public String create(HttpServerRequest request){
         return request.method().name()+":" + request.path();
     }
 
+    @Override
     public boolean match(String request, String cached){
         return  cached.equals("*") || request.startsWith(cached.replaceAll("\\*", ""));
     }

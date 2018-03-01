@@ -53,8 +53,8 @@ Subject subject = ctx.get(SimpleConstants.CTX_SUBJECT_KEY)
 <br><br><br>
 4.注意<br>
 在vertx-auth-simple中,默认的权限字符串生成格式为 "请求方法:请求地址",如 "GET:/articles/page" <br>
-默认的权限字符串校验支持最后一位*号匹配,如 GET:/article/123456 和 GET:/article/456789 分别表示请求不同的资源,那么可以通过 GET:/article/* 或者 GET:/article 来同时匹配两者 <br>
-单纯一个*号表示匹配所有访问<br>
+默认的权限字符串校验支持最后一位\*号匹配,如 GET:/article/123456 和 GET:/article/456789 分别表示请求不同的资源,
+那么可以通过 GET:/article/* 或者 GET:/article 来同时匹配两者 <br>单纯一个*号表示匹配所有访问<br>
 
 <br><br><br>
 5.扩展功能<br>

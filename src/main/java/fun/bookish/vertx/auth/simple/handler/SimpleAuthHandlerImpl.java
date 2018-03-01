@@ -1,6 +1,6 @@
 package fun.bookish.vertx.auth.simple.handler;
 
-import fun.bookish.vertx.auth.simple.constant.SimpleConfigConstants;
+import fun.bookish.vertx.auth.simple.constant.SimpleAuthConfigKey;
 import fun.bookish.vertx.auth.simple.constant.SimpleConstants;
 import fun.bookish.vertx.auth.simple.core.Subject;
 import fun.bookish.vertx.auth.simple.encryption.DefaultAESEncryption;
@@ -49,21 +49,21 @@ public class SimpleAuthHandlerImpl implements SimpleAuthHandler{
     private void handleConfig(JsonObject config) {
 
         //校验session过期时间
-        Long sessionTimeout = config.getLong(SimpleConfigConstants.SESSION_TIMEOUT);
+        Long sessionTimeout = config.getLong(SimpleAuthConfigKey.SESSION_TIMEOUT.value());
         if(sessionTimeout == null || sessionTimeout<SimpleConstants.DEFAULT_SESSION_TIMEOUT){
-            config.put(SimpleConfigConstants.SESSION_TIMEOUT,SimpleConstants.DEFAULT_SESSION_TIMEOUT);
+            config.put(SimpleAuthConfigKey.SESSION_TIMEOUT.value(),SimpleConstants.DEFAULT_SESSION_TIMEOUT);
         }
 
         //校验rememberMe cookie过期时间
-        Long rememberMeTimeout = config.getLong(SimpleConfigConstants.REMEMBERME_TIMEOUT);
+        Long rememberMeTimeout = config.getLong(SimpleAuthConfigKey.REMEMBERME_COOKIE_TIMEOUT.value());
         if(rememberMeTimeout == null || rememberMeTimeout<SimpleConstants.DEFAULT_REMEMBERME_TIMEOUT){
-            config.put(SimpleConfigConstants.REMEMBERME_TIMEOUT,SimpleConstants.DEFAULT_REMEMBERME_TIMEOUT);
+            config.put(SimpleAuthConfigKey.REMEMBERME_COOKIE_TIMEOUT.value(),SimpleConstants.DEFAULT_REMEMBERME_TIMEOUT);
         }
 
         //校验加密key
-        String aesKey = config.getString(SimpleConfigConstants.AES_KEY);
+        String aesKey = config.getString(SimpleAuthConfigKey.ENCRYPT_KEY.value());
         if(StringUtils.isBlank(aesKey)){
-            config.put(SimpleConfigConstants.AES_KEY,SimpleConstants.DEFAULT_AES_KEY);
+            config.put(SimpleAuthConfigKey.ENCRYPT_KEY.value(),SimpleConstants.DEFAULT_AES_KEY);
         }
 
     }

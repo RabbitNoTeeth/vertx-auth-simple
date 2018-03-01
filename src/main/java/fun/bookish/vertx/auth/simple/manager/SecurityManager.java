@@ -1,16 +1,12 @@
 package fun.bookish.vertx.auth.simple.manager;
 
-import fun.bookish.vertx.auth.simple.constant.SimpleConfigConstants;
+import fun.bookish.vertx.auth.simple.constant.SimpleAuthConfigKey;
 import fun.bookish.vertx.auth.simple.constant.SimpleConstants;
 import fun.bookish.vertx.auth.simple.core.Subject;
-import fun.bookish.vertx.auth.simple.encryption.SimpleEncryptMode;
 import fun.bookish.vertx.auth.simple.encryption.SimpleEncryption;
-import fun.bookish.vertx.auth.simple.ext.PermissionStrategy;
 import fun.bookish.vertx.auth.simple.provider.SimpleAuthProvider;
-import fun.bookish.vertx.auth.simple.user.SimpleAuthUser;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.auth.AuthProvider;
 import io.vertx.ext.web.Cookie;
 import io.vertx.ext.web.RoutingContext;
 
@@ -48,7 +44,7 @@ public class SecurityManager {
 
         LocalDateTime now = LocalDateTime.now();
 
-        Long sessionTimeout = this.config.getLong(SimpleConfigConstants.SESSION_TIMEOUT);
+        Long sessionTimeout = this.config.getLong(SimpleAuthConfigKey.SESSION_TIMEOUT.value());
         this.vertx.setPeriodic(sessionTimeout,id -> {
 
             Set<Map.Entry<String, Subject>> entrySet = subjectCache.entrySet();
@@ -59,7 +55,7 @@ public class SecurityManager {
             }
         });
 
-        Long rememberMeTimeout = this.config.getLong(SimpleConfigConstants.REMEMBERME_TIMEOUT);
+        Long rememberMeTimeout = this.config.getLong(SimpleAuthConfigKey.REMEMBERME_COOKIE_TIMEOUT.value());
         this.vertx.setPeriodic(rememberMeTimeout,id -> {
             Set<Map.Entry<String, Subject>> entrySet = rememberMeCache.entrySet();
             for(Map.Entry<String, Subject> entry:entrySet){

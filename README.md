@@ -84,12 +84,14 @@ SimpleAuthHandler authHandler = SimpleAuthHandler.create(this.vertx,myAuthProvid
 /**
  * vertx-auth-simple支持通过JsonObject对象来自定义配置，包括session会话过期时间、
  * rememberMe cookie的过期时间和加密密钥。
+ * 枚举类SimpleAuthConfigKey中定义了所有可配置选项的键值，虽然使用enum在配置时不太美观，但是能在一定程度上
+ * 避免客户端在使用时由于拼写错误引起的配置失败问题。
  * 只需要在创建权限拦截器时传入配置对象即可
  */
  JsonObject config = new JsonObject();
- config.put(SimpleConfigConstants.SESSION_TIMEOUT,3600*30); //时间单位为s
- config.put(SimpleConfigConstants.REMEMBERME_TIMEOUT,3600*24*30);  //时间单位为s
- config.put(SimpleConfigConstants.AES_KEY,"自定义的cookie加密密钥");
+ config.put(SimpleAuthConfigKey.SESSION_TIMEOUT.value(),3600*30); //时间单位为s
+ config.put(SimpleAuthConfigKey.REMEMBERME_COOKIE_TIMEOUT.value(),3600*24*30);  //时间单位为s
+ config.put(SimpleAuthConfigKey.ENCRYPT_KEY.value(),"自定义的cookie加密密钥");
  SimpleAuthHandler authHandler = SimpleAuthHandler.create(this.vertx,myAuthProviderImpl,config);
 </code></pre>
 

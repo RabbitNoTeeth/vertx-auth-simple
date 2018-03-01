@@ -1,13 +1,11 @@
 package fun.bookish.vertx.auth.simple.core;
 
-import fun.bookish.vertx.auth.simple.constant.SimpleConfigConstants;
+import fun.bookish.vertx.auth.simple.constant.SimpleAuthConfigKey;
 import fun.bookish.vertx.auth.simple.constant.SimpleConstants;
 import fun.bookish.vertx.auth.simple.encryption.SimpleEncryptMode;
 import fun.bookish.vertx.auth.simple.encryption.SimpleEncryption;
-import fun.bookish.vertx.auth.simple.ext.PermissionStrategy;
 import fun.bookish.vertx.auth.simple.manager.SecurityManager;
 import fun.bookish.vertx.auth.simple.provider.SimpleAuthProvider;
-import fun.bookish.vertx.auth.simple.user.SimpleAuthUser;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -67,7 +65,7 @@ public class Subject {
                                 , SimpleEncryptMode.ENCRYPT);
                         //创建rememberMe cookie，并写入到response中
                         Cookie cookie = Cookie.cookie(SimpleConstants.COOKIE_REMEMBERME_KEY,cookieValue)
-                                .setMaxAge(this.config.getInteger(SimpleConfigConstants.REMEMBERME_TIMEOUT))
+                                .setMaxAge(this.config.getInteger(SimpleAuthConfigKey.REMEMBERME_COOKIE_TIMEOUT.value()))
                                 .setHttpOnly(false).setPath("/");
                         ctx.addCookie(cookie);
                         this.securityManager.cacheRememberMe(cookieValue,this);

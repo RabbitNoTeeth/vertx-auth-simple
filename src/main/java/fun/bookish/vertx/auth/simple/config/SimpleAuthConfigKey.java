@@ -1,4 +1,4 @@
-package fun.bookish.vertx.auth.simple.constant;
+package fun.bookish.vertx.auth.simple.config;
 
 /**
  * 配置键值常量

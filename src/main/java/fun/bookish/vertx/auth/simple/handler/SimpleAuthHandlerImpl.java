@@ -1,6 +1,6 @@
 package fun.bookish.vertx.auth.simple.handler;
 
-import fun.bookish.vertx.auth.simple.constant.SimpleAuthConfigKey;
+import fun.bookish.vertx.auth.simple.config.SimpleAuthConfigKey;
 import fun.bookish.vertx.auth.simple.constant.SimpleConstants;
 import fun.bookish.vertx.auth.simple.core.Subject;
 import fun.bookish.vertx.auth.simple.encryption.DefaultAESEncryption;

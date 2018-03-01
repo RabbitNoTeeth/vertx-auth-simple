@@ -3,7 +3,10 @@
 适用场景：用户登陆后动态从数据库或其他介质中获取权限信息
 
 ## 配置使用（how to use）
+
+<br><br><br>
 1.提供SimpleAuthProvider接口实现(provide a implement of SimpleAuthProvider)
+
 <pre><code>
 
 public class MyAuthProviderImpl implements SimpleAuthProvider {
@@ -23,7 +26,7 @@ public class MyAuthProviderImpl implements SimpleAuthProvider {
 
 </code></pre>
 
-<br>
+<br><br><br>
 2.配置router（config the Router）
 
 <pre><code>
@@ -39,7 +42,7 @@ authHandler.addAnnoPermissions(annoPermissions)
 router.route().handler(authHandler);
 </code></pre>
 
-<br>
+<br><br><br>
 3.获取Subject实体（get the subject of user）<br>
 
 <pre><code>
@@ -47,13 +50,13 @@ router.route().handler(authHandler);
 Subject subject = ctx.get(SimpleConstants.CTX_SUBJECT_KEY)
 </code></pre>
 
-<br>
+<br><br><br>
 4.注意<br>
 在vertx-auth-simple中,默认的权限字符串生成格式为 "请求方法:请求地址",如 "GET:/articles/page" <br>
 默认的权限字符串校验支持最后一位*号匹配,如 GET:/article/123456 和 GET:/article/456789 分别表示请求不同的资源,那么可以通过 GET:/article/* 或者 GET:/article 来同时匹配两者 <br>
 单纯一个*号表示匹配所有访问<br>
 
-<br>
+<br><br><br>
 5.扩展功能<br>
 
 1> 自定义权限字符串的生成格式和校验规则

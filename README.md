@@ -1,5 +1,6 @@
 # vertx-auth-simple
-适用于resuful api的vertx动态权限认证框架
+基于vertx-auth-common和resuful api的vertx动态权限认证框架<br>
+适用场景：用户登陆后动态从数据库或其他介质中获取权限信息
 
 ## 配置使用（how to use）
 1.提供SimpleAuthProvider接口实现(provide a implement of SimpleAuthProvider)

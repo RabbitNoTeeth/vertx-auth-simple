@@ -11,7 +11,7 @@ public class MyAuthProviderImpl implements SimpleAuthProvider {
      * 
      * @param authInfo 用户登录时提交的验证信息
      * @param resultHandler 处理用户验证结果
-     *                      验证成功，创建SimpleAuthUser对象（该对象中包含了用户权限信息）交由resultHandler处理
+     *                      验证成功，创建SimpleAuthUser对象（该对象中包含用户权限信息）交由resultHandler处理
      *                      验证失败，自定义包含失败原因的异常，交由resultHandler处理
     */
     public void authenticate(JsonObject authInfo, Handler<AsyncResult<User>> resultHandler) {
@@ -32,12 +32,14 @@ List<String> annoPermissions = listOf("GET:/articles/page","GET:/articleClassifi
 // 创建实现类
 MyAuthProviderImpl myAuthProviderImpl = new myAuthProviderImpl()
 
-// 注册权限处理器
-router.route().handler(SimpleAuthHandler.create(this.vertx,myAuthProviderImpl).addAnnoPermissions(annoPermissions))
+// 创建并注册权限处理器
+SimpleAuthHandler authHandler = SimpleAuthHandler.create(this.vertx,myAuthProviderImpl);
+authHandler.addAnnoPermissions(annoPermissions)
+router.route().handler(authHandler);
 </code></pre>
 
 <br>
-3.获取Subject实体<br>（get the subject of user）
+3.获取Subject实体（get the subject of user）<br>
 
 <pre><code>
 //从RoterContext上下文中获取(SimpleAuthHandler会在拦截请求后将当前会话的subject放到RoterContext上下文中)
@@ -51,10 +53,12 @@ Subject subject = ctx.get(SimpleConstants.CTX_SUBJECT_KEY)
 单纯一个*号表示匹配所有访问<br>
 
 <br>
-5.自定义权限字符串的生成格式和校验规则<br>
+5.扩展功能<br>
+
+1> 自定义权限字符串的生成格式和校验规则
 
 <pre><code>
-提供PermissionStrategy接口的实现
+//首先，提供PermissionStrategy接口的实现
 public class MyPermissionStrategy implements PermissionStrategy{
 
     @Override
@@ -68,10 +72,25 @@ public class MyPermissionStrategy implements PermissionStrategy{
     }
 }
 
-创建权限拦截器时，传入自定义的权限字符串策略
-SimpleAuthHandler handler = SimpleAuthHandler.create(this.vertx,myAuthProviderImpl);
+MyPermissionStrategy myPermissionStrategy = new MyPermissionStrategy();
+//然后在创建权限拦截器时，传入自定义的权限字符串策略
+SimpleAuthHandler authHandler = SimpleAuthHandler.create(this.vertx,myAuthProviderImpl,myPermissionStrategy);
 </code></pre>
 
+2> 自定义session会话过期时间、rememberMe cookie的过期时间和加密密钥
+
+<pre><code>
+/**
+ * vertx-auth-simple支持通过JsonObject对象来自定义配置，包括session会话过期时间、
+ * rememberMe cookie的过期时间和加密密钥。
+ * 只需要在创建权限拦截器时传入配置对象即可
+ */
+ JsonObject config = new JsonObject();
+ config.put(SimpleConfigConstants.SESSION_TIMEOUT,3600*30); //时间单位为s
+ config.put(SimpleConfigConstants.REMEMBERME_TIMEOUT,3600*24*30);  //时间单位为s
+ config.put(SimpleConfigConstants.AES_KEY,"自定义的cookie加密密钥");
+ SimpleAuthHandler authHandler = SimpleAuthHandler.create(this.vertx,myAuthProviderImpl,config);
+</code></pre>
 
 
 

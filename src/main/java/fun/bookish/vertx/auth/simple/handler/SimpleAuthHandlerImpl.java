@@ -132,7 +132,7 @@ public class SimpleAuthHandlerImpl implements SimpleAuthHandler{
                         ctx.put(SimpleConstants.ROUTER_CTX_START_TIME_KEY,System.nanoTime());
                         ctx.next();
                     }else{
-                        ctx.response().setStatusCode(403).end("you have no permission");
+                        ctx.response().setStatusCode(403).end("you have no permission to access '"+ctx.request().path()+"'");
                     }
                 });
             }else{

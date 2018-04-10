@@ -103,7 +103,7 @@ public class SecurityManager {
         String jSessionId = ctx.getCookie(SimpleConstants.COOKIE_JSESSIONID_KEY).getValue();
         Subject subject = subjectCache.get(jSessionId);
         if(subject == null){
-            Subject newSubject = new Subject(this.vertx,authProvider,this,this.encryption,this.config);
+            Subject newSubject = new Subject(jSessionId,this.vertx,authProvider,this,this.encryption,this.config);
             if(subjectCache.putIfAbsent(jSessionId,newSubject) == null){
                 subject = newSubject;
             }else{

@@ -24,13 +24,15 @@ public class Subject {
 
     public final LocalDateTime time = LocalDateTime.now();
 
+    private final String sessionID;
     private final Vertx vertx;
     private final SimpleAuthProvider authProvider;
     private final SecurityManager securityManager;
     private final SimpleEncryption encryption;
     private final JsonObject config;
 
-    public Subject(Vertx vertx,SimpleAuthProvider authProvider,SecurityManager securityManager,SimpleEncryption encryption,JsonObject config){
+    public Subject(String sessionID,Vertx vertx,SimpleAuthProvider authProvider,SecurityManager securityManager,SimpleEncryption encryption,JsonObject config){
+        this.sessionID = sessionID;
         this.vertx = vertx;
         this.authProvider = authProvider;
         this.securityManager = securityManager;
@@ -121,5 +123,9 @@ public class Subject {
 
     public JsonObject getPrincipal() {
         return this.authUser==null?null : this.authUser.principal();
+    }
+
+    public String getSessionID() {
+        return sessionID;
     }
 }

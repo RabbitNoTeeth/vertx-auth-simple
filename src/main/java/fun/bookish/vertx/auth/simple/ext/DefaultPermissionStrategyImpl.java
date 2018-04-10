@@ -5,7 +5,7 @@ import io.vertx.core.http.HttpServerRequest;
 /**
  * 权限字符串策略接口默认实现
  **/
-public class PermissionStrategyImpl implements PermissionStrategy {
+public class DefaultPermissionStrategyImpl implements PermissionStrategy {
 
     @Override
     public String create(HttpServerRequest request){

@@ -14,19 +14,11 @@ import java.util.List;
 public interface SimpleAuthHandler extends Handler<RoutingContext> {
 
     static SimpleAuthHandler create(Vertx vertx, SimpleAuthProvider simpleAuthProvider){
-        return new SimpleAuthHandlerImpl(vertx,simpleAuthProvider,null,new JsonObject());
-    }
-
-    static SimpleAuthHandler create(Vertx vertx, SimpleAuthProvider simpleAuthProvider,PermissionStrategy permissionStrategy){
-        return new SimpleAuthHandlerImpl(vertx,simpleAuthProvider,permissionStrategy,new JsonObject());
+        return new SimpleAuthHandlerImpl(vertx,simpleAuthProvider,new JsonObject());
     }
 
     static SimpleAuthHandler create(Vertx vertx, SimpleAuthProvider simpleAuthProvider, JsonObject config){
-        return new SimpleAuthHandlerImpl(vertx,simpleAuthProvider,null,config);
-    }
-
-    static SimpleAuthHandler create(Vertx vertx, SimpleAuthProvider simpleAuthProvider, PermissionStrategy permissionStrategy, JsonObject config){
-        return new SimpleAuthHandlerImpl(vertx,simpleAuthProvider,permissionStrategy,config);
+        return new SimpleAuthHandlerImpl(vertx,simpleAuthProvider,config);
     }
 
     boolean checkAnno(String permission);

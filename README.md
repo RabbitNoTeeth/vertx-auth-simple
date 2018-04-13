@@ -19,7 +19,17 @@ public class MyAuthProviderImpl implements SimpleAuthProvider {
      *                      验证失败，自定义包含失败原因的异常，交由resultHandler处理
     */
     public void authenticate(JsonObject authInfo, Handler<AsyncResult<User>> resultHandler) {
-        // do your authentication...
+        /** for example：
+        if(authInfo is right){
+            SimpleAuthUser user = new SimpleAuthUser();
+            user.setAuthProvider(this);
+            user.setPrincipal(...);
+            user.appendPermissions(...);
+            resultHandler.handle(Future.succeededFuture(user));
+        }else{
+            resultHandler.handle(Future.failedFuture(a Throwable));
+        } 
+        */
     }
 
 }
@@ -64,40 +74,42 @@ Subject subject = ctx.get(SimpleConstants.CTX_SUBJECT_KEY)
 <pre><code>
 //首先，提供PermissionStrategy接口的实现
 public class MyPermissionStrategy implements PermissionStrategy{
-
     @Override
-    public String create(HttpServerRequest request){
-        //自定义权限字符串生成格式并返回
-    }
-    
+    public String create(HttpServerRequest request){ //自定义权限字符串生成格式并返回 }
     @Override
-    public boolean match(String requestPermission,String cachedPermission){
-        //自定义权限字符串的校验规则
-    }
+    public boolean match(String requestPermission,String cachedPermission){ //自定义权限字符串的校验规则 }
 }
-JsonObject config = new JsonObject();
-config.put(SimpleAuthConfigKey.SESSION_TIMEOUT.value(),new MyPermissionStrategy());
+SimpleAuthOptions options = new SimpleAuthOptions();
+options.setPermissionStrategy(new MyPermissionStrategy());
 //然后在创建权限拦截器时，传入自定义的权限字符串策略
-SimpleAuthHandler authHandler = SimpleAuthHandler.create(this.vertx,myAuthProviderImpl,config);
+SimpleAuthHandler authHandler = SimpleAuthHandler.create(this.vertx,myAuthProviderImpl,options);
 </code></pre>
 
 2> 自定义session会话过期时间、rememberMe cookie的过期时间和加密密钥
 
 <pre><code>
-/**
- * vertx-auth-simple支持通过JsonObject对象来自定义配置，包括session会话过期时间、
- * rememberMe cookie的过期时间和加密密钥。
- * 枚举类SimpleAuthConfigKey中定义了所有可配置选项的键值，虽然使用enum在配置时不太美观，但是能在一定程度上
- * 避免客户端在使用时由于拼写错误引起的配置失败问题。
- * 只需要在创建权限拦截器时传入配置对象即可
- */
- JsonObject config = new JsonObject();
- config.put(SimpleAuthConfigKey.SESSION_TIMEOUT.value(),3600*30); //时间单位为s
- config.put(SimpleAuthConfigKey.REMEMBERME_COOKIE_TIMEOUT.value(),3600*24*30);  //时间单位为s
- config.put(SimpleAuthConfigKey.ENCRYPT_KEY.value(),"自定义的cookie加密密钥");
- SimpleAuthHandler authHandler = SimpleAuthHandler.create(this.vertx,myAuthProviderImpl,config);
+ SimpleAuthOptions options = new SimpleAuthOptions();
+ options.setSessionTimeout(3600*30); //时间单位为s
+ options.setRememberMeTimeout(3600*24*30);  //时间单位为s
+ options.setEncryptionKey("自定义的rememberme cookie加密密钥");
+ SimpleAuthHandler authHandler = SimpleAuthHandler.create(this.vertx,myAuthProviderImpl,options);
 </code></pre>
 
+3> 自定义rememberMe cookie加密方式
+
+<pre><code>
+ 
+ public class MySimpleAuthEncryption implements SimpleAuthEncryption{
+    @Override
+    public String encryptOrDecrypt(String data,String key,SimpleAuthEncryptMode mode){
+        //...
+    }
+ }
+ 
+ SimpleAuthOptions options = new SimpleAuthOptions();
+ options.setSimpleEncryption(new MySimpleAuthEncryption());
+ SimpleAuthHandler authHandler = SimpleAuthHandler.create(this.vertx,myAuthProviderImpl,options);
+</code></pre>
 
 
 

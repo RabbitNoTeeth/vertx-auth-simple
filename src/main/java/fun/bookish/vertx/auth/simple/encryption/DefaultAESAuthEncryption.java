@@ -8,7 +8,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 
-public class DefaultAESEncryption implements SimpleEncryption {
+public class DefaultAESAuthEncryption implements SimpleAuthEncryption {
 
     private static MessageDigest md5Digest;
 
@@ -21,7 +21,7 @@ public class DefaultAESEncryption implements SimpleEncryption {
     }
 
     @Override
-    public String encryptOrDecrypt(String data, String key, SimpleEncryptMode mode) {
+    public String encryptOrDecrypt(String data, String key, SimpleAuthEncryptMode mode) {
         try {
             if (StringUtils.isBlank(data)) {
                 throw new IllegalArgumentException("can not encrypt or decrypt a blank string");
@@ -30,7 +30,7 @@ public class DefaultAESEncryption implements SimpleEncryption {
                 throw new IllegalArgumentException("can not encrypt or decrypt without a key");
             }
 
-            boolean encrypt = (mode == SimpleEncryptMode.ENCRYPT);
+            boolean encrypt = (mode == SimpleAuthEncryptMode.ENCRYPT);
             int mod = encrypt?Cipher.ENCRYPT_MODE:Cipher.DECRYPT_MODE;
             byte[] content;
 

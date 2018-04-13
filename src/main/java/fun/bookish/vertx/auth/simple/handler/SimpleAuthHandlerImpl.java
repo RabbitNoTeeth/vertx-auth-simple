@@ -1,28 +1,13 @@
 package fun.bookish.vertx.auth.simple.handler;
 
-import fun.bookish.vertx.auth.simple.config.SimpleAuthConfigKey;
-import fun.bookish.vertx.auth.simple.constant.SimpleConstants;
-import fun.bookish.vertx.auth.simple.core.Subject;
-import fun.bookish.vertx.auth.simple.encryption.DefaultAESEncryption;
-import fun.bookish.vertx.auth.simple.encryption.SimpleEncryption;
+import fun.bookish.vertx.auth.simple.config.SimpleAuthOptions;
 import fun.bookish.vertx.auth.simple.exception.AuthenticateFailException;
 import fun.bookish.vertx.auth.simple.exception.AuthoriseFailException;
-import fun.bookish.vertx.auth.simple.ext.DefaultPermissionStrategyImpl;
-import fun.bookish.vertx.auth.simple.ext.PermissionStrategy;
-import fun.bookish.vertx.auth.simple.manager.SecurityManager;
 import fun.bookish.vertx.auth.simple.provider.SimpleAuthProvider;
-import fun.bookish.vertx.auth.simple.util.SimpleUtils;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Vertx;
-import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.web.Cookie;
 import io.vertx.ext.web.RoutingContext;
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * @author Don9
@@ -30,8 +15,8 @@ import java.util.Set;
  **/
 public class SimpleAuthHandlerImpl extends AbstractSimpleAuthHandler{
 
-    SimpleAuthHandlerImpl(Vertx vertx,SimpleAuthProvider simpleAuthProvider,JsonObject config){
-        super(vertx, simpleAuthProvider, config);
+    SimpleAuthHandlerImpl(Vertx vertx,SimpleAuthProvider simpleAuthProvider,SimpleAuthOptions options){
+        super(vertx, simpleAuthProvider, options);
     }
 
     @Override

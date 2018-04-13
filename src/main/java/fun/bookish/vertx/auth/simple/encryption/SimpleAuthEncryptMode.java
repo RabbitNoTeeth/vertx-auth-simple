@@ -1,6 +1,6 @@
 package fun.bookish.vertx.auth.simple.encryption;
 
-public enum SimpleEncryptMode {
+public enum SimpleAuthEncryptMode {
 
     ENCRYPT,DECRYPT
 

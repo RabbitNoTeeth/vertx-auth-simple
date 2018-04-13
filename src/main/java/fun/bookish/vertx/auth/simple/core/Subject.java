@@ -1,9 +1,9 @@
 package fun.bookish.vertx.auth.simple.core;
 
-import fun.bookish.vertx.auth.simple.config.SimpleAuthConfigKey;
-import fun.bookish.vertx.auth.simple.constant.SimpleConstants;
-import fun.bookish.vertx.auth.simple.encryption.SimpleEncryptMode;
-import fun.bookish.vertx.auth.simple.encryption.SimpleEncryption;
+import fun.bookish.vertx.auth.simple.config.SimpleAuthOptions;
+import fun.bookish.vertx.auth.simple.constant.SimpleAuthConstants;
+import fun.bookish.vertx.auth.simple.encryption.SimpleAuthEncryptMode;
+import fun.bookish.vertx.auth.simple.encryption.SimpleAuthEncryption;
 import fun.bookish.vertx.auth.simple.manager.SecurityManager;
 import fun.bookish.vertx.auth.simple.provider.SimpleAuthProvider;
 import io.vertx.core.AsyncResult;
@@ -28,16 +28,16 @@ public class Subject {
     private final Vertx vertx;
     private final SimpleAuthProvider authProvider;
     private final SecurityManager securityManager;
-    private final SimpleEncryption encryption;
-    private final JsonObject config;
+    private final SimpleAuthEncryption encryption;
+    private final SimpleAuthOptions options;
 
-    public Subject(String sessionID,Vertx vertx,SimpleAuthProvider authProvider,SecurityManager securityManager,SimpleEncryption encryption,JsonObject config){
+    public Subject(String sessionID, Vertx vertx, SimpleAuthProvider authProvider, SecurityManager securityManager, SimpleAuthEncryption encryption, SimpleAuthOptions options){
         this.sessionID = sessionID;
         this.vertx = vertx;
         this.authProvider = authProvider;
         this.securityManager = securityManager;
         this.encryption = encryption;
-        this.config = config;
+        this.options = options;
     }
 
     private volatile User authUser;
@@ -58,16 +58,16 @@ public class Subject {
                 this.authUser = user;
 
                 //判断rememberMe
-                Object rememberMe = authInfo.getValue(SimpleConstants.AUTH_REMEMBERME_KEY);
+                Object rememberMe = authInfo.getValue(this.options.getRememberMeKey());
                 if(rememberMe != null){
                     if(rememberMe.equals(true) || rememberMe.toString().equals("true")){
                         this.rememberMe = true;
                         //对user中的principle进行加密
-                        String cookieValue = this.encryption.encryptOrDecrypt(user.principal().toString(),SimpleConstants.DEFAULT_AES_KEY
-                                , SimpleEncryptMode.ENCRYPT);
+                        String cookieValue = this.encryption.encryptOrDecrypt(user.principal().toString(), SimpleAuthConstants.DEFAULT_ENCRYPT_KEY
+                                , SimpleAuthEncryptMode.ENCRYPT);
                         //创建rememberMe cookie，并写入到response中
-                        Cookie cookie = Cookie.cookie(SimpleConstants.COOKIE_REMEMBERME_KEY,cookieValue)
-                                .setMaxAge(this.config.getInteger(SimpleAuthConfigKey.REMEMBERME_COOKIE_TIMEOUT.value()))
+                        Cookie cookie = Cookie.cookie(this.options.getRememberMeCookieKey(),cookieValue)
+                                .setMaxAge(this.options.getRememberMeTimeout())
                                 .setHttpOnly(false).setPath("/");
                         ctx.addCookie(cookie);
                         this.securityManager.cacheRememberMe(cookieValue,this);
@@ -100,7 +100,7 @@ public class Subject {
     public void logout(RoutingContext ctx){
         this.authUser = null;
         this.rememberMe = false;
-        SecurityManager securityManager = ctx.vertx().getOrCreateContext().get(SimpleConstants.VERTX_CTX_SECURITY_MANAGER_KEY);
+        SecurityManager securityManager = ctx.vertx().getOrCreateContext().get(SimpleAuthConstants.VERTX_CTX_SECURITY_MANAGER_KEY);
         securityManager.remove(ctx);
     }
 

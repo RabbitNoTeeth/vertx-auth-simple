@@ -75,10 +75,10 @@ public class MyPermissionStrategy implements PermissionStrategy{
         //自定义权限字符串的校验规则
     }
 }
-
-MyPermissionStrategy myPermissionStrategy = new MyPermissionStrategy();
+JsonObject config = new JsonObject();
+config.put(SimpleAuthConfigKey.SESSION_TIMEOUT.value(),new MyPermissionStrategy());
 //然后在创建权限拦截器时，传入自定义的权限字符串策略
-SimpleAuthHandler authHandler = SimpleAuthHandler.create(this.vertx,myAuthProviderImpl,myPermissionStrategy);
+SimpleAuthHandler authHandler = SimpleAuthHandler.create(this.vertx,myAuthProviderImpl,config);
 </code></pre>
 
 2> 自定义session会话过期时间、rememberMe cookie的过期时间和加密密钥

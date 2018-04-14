@@ -111,6 +111,12 @@ SimpleAuthHandler authHandler = SimpleAuthHandler.create(this.vertx,myAuthProvid
  SimpleAuthHandler authHandler = SimpleAuthHandler.create(this.vertx,myAuthProviderImpl,options);
 </code></pre>
 
+4> 如果浏览器端禁用了cookie，那么可以从RouterContext中获取到JSESSIONID，便于子路由通过响应
+将JSESSIONID传给浏览器
+
+<pre><code>
+ String JSESSIONID = routerContext.get(SimpleAuthConsts.JSESSIONID_KEY);
+</code></pre>
 
 
 

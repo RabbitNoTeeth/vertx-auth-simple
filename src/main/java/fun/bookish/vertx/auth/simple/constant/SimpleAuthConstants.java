@@ -12,6 +12,7 @@ public class SimpleAuthConstants {
 
     private SimpleAuthConstants(){}
 
+    public static final String JESSIONID_KEY = "simple-auth.JSESSIONID";
     public static final String JSESSIONID_COOKIE_KEY = "simple-auth.JSESSIONID";
     public static final String REMEMBERME_COOKIE_KEY = "simple-auth.RememberMe";
     public static final String VERTX_CTX_SECURITY_MANAGER_KEY = "simple-auth.SecurityManager";

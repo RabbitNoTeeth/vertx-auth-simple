@@ -24,7 +24,7 @@ public interface SimpleAuthHandler extends Handler<RoutingContext> {
 
     boolean checkAnno(String permission);
 
-    void checkCookie(RoutingContext ctx);
+    void checkSessionId(RoutingContext ctx);
 
     SimpleAuthHandler addAnnoPermissions(Collection<String> permissions);
 

@@ -1,6 +1,7 @@
 package fun.bookish.vertx.auth.simple.manager;
 
 import fun.bookish.vertx.auth.simple.config.SimpleAuthOptions;
+import fun.bookish.vertx.auth.simple.constant.SimpleAuthConstants;
 import fun.bookish.vertx.auth.simple.core.Subject;
 import fun.bookish.vertx.auth.simple.encryption.SimpleAuthEncryption;
 import fun.bookish.vertx.auth.simple.provider.SimpleAuthProvider;
@@ -103,16 +104,14 @@ public class SecurityManager {
     }
 
     private Subject getOrCreateSubject(RoutingContext ctx){
-        //由于在处理器SimpleAuthHandlerImpl进行权限校验前，进行了JSESSIONID cookie的检查，所以此处可以保证jSessionId一定存在
-        String jSessionId = ctx.getCookie(SESSIONID_COOKIE_KEY).getValue();
+        //由于在处理器SimpleAuthHandlerImpl进行权限校验前，进行了JSESSIONID的检查，所以此处可以保证jSessionId一定存在
+        String jSessionIdFromCookie = ctx.getCookie(SESSIONID_COOKIE_KEY).getValue();
+        String jSessionIdFromCtx = ctx.get(SimpleAuthConstants.JESSIONID_KEY);
+        String jSessionId = jSessionIdFromCookie != null ? jSessionIdFromCookie : jSessionIdFromCtx;
         Subject subject = subjectCache.get(jSessionId);
         if(subject == null){
             Subject newSubject = new Subject(jSessionId,this.vertx,authProvider,this,this.encryption,this.options);
-            if(subjectCache.putIfAbsent(jSessionId,newSubject) == null){
-                subject = newSubject;
-            }else{
-                subject = subjectCache.get(jSessionId);
-            }
+            return subjectCache.putIfAbsent(jSessionId,newSubject) == null ? newSubject : subjectCache.get(jSessionId);
         }
         return subject;
     }

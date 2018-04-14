@@ -16,6 +16,8 @@ import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.Cookie;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.web.Session;
+import io.vertx.ext.web.sstore.impl.SessionImpl;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collection;
@@ -104,10 +106,15 @@ public abstract class AbstractSimpleAuthHandler implements SimpleAuthHandler {
      * 检查JSESSIONID cookie,如果请求中没有该cookie,则创建JSESSIONID cookie写入到响应中
      */
     @Override
-    public final void checkCookie(RoutingContext ctx) {
+    public final void checkSessionId(RoutingContext ctx) {
         String sessionIdCookieKey = this.options.getJsessionIdCookieKey();
-        if(ctx.getCookie(sessionIdCookieKey) == null){
-            ctx.addCookie(Cookie.cookie(sessionIdCookieKey, SimpleUtils.getUUID()).setHttpOnly(true).setPath("/"));
+        String sessionIdFromCookie = ctx.getCookie(sessionIdCookieKey).getValue();
+        String sessionIdFromParam = ctx.request().getParam(sessionIdCookieKey);
+        boolean sessionIdNotExists = StringUtils.isBlank(sessionIdFromCookie) && StringUtils.isBlank(sessionIdFromParam);
+        if(sessionIdNotExists){
+            String newSessionId = SimpleUtils.getUUID();
+            ctx.addCookie(Cookie.cookie(sessionIdCookieKey, newSessionId).setHttpOnly(true).setPath("/"));
+            ctx.put(SimpleAuthConstants.JESSIONID_KEY,newSessionId);
         }
     }
 
@@ -132,8 +139,8 @@ public abstract class AbstractSimpleAuthHandler implements SimpleAuthHandler {
     @Override
     public final void handle(RoutingContext ctx) {
 
-        //检查JSESSIONID cookie,如果没有，那么生成JSESSIONID cookie并写入到response中
-        checkCookie(ctx);
+        //检查session
+        checkSessionId(ctx);
 
         HttpMethod method = ctx.request().method();
 

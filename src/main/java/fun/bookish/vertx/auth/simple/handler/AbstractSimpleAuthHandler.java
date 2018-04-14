@@ -40,11 +40,39 @@ public abstract class AbstractSimpleAuthHandler implements SimpleAuthHandler {
         this.simpleAuthProvider = simpleAuthProvider;
         this.options = options.copy();
         handleConfig(this.options);
-        this.securityManager = new SecurityManager(vertx,simpleAuthProvider,this.encryption,options);
-        vertx.getOrCreateContext().put(SimpleAuthConstants.VERTX_CTX_SECURITY_MANAGER_KEY,this.securityManager);
+        createSecurityManager(this.vertx,this.simpleAuthProvider,this.encryption,this.options);
     }
 
-    // 解析传入的配置对象
+    /**
+     * 创建安全管理器
+     * @param vertx
+     * @param simpleAuthProvider
+     * @param encryption
+     * @param options
+     */
+    private void createSecurityManager(Vertx vertx, SimpleAuthProvider simpleAuthProvider, SimpleAuthEncryption encryption, SimpleAuthOptions options){
+
+        SecurityManager securityManager = vertx.getOrCreateContext().get(SimpleAuthConstants.VERTX_CTX_SECURITY_MANAGER_KEY);
+
+        if(securityManager == null){
+            synchronized (this){
+                securityManager = vertx.getOrCreateContext().get(SimpleAuthConstants.VERTX_CTX_SECURITY_MANAGER_KEY);
+                if(securityManager == null){
+                    SecurityManager newSecurityManager = new SecurityManager(vertx,simpleAuthProvider,this.encryption,options);
+                    vertx.getOrCreateContext().put(SimpleAuthConstants.VERTX_CTX_SECURITY_MANAGER_KEY,newSecurityManager);
+                    securityManager = newSecurityManager;
+                }
+            }
+        }
+
+        this.securityManager = securityManager;
+
+    }
+
+    /**
+     * 解析传入的配置对象
+     * @param options
+     */
     private void handleConfig(SimpleAuthOptions options) {
 
         //校验jsessionid cookie key

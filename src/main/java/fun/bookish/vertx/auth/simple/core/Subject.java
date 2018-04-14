@@ -63,7 +63,7 @@ public class Subject {
                     if(rememberMe.equals(true) || rememberMe.toString().equals("true")){
                         this.rememberMe = true;
                         //对user中的principle进行加密
-                        String cookieValue = this.encryption.encryptOrDecrypt(user.principal().toString(), SimpleAuthConstants.DEFAULT_ENCRYPT_KEY
+                        String cookieValue = this.encryption.encryptOrDecrypt(user.principal().toString(), this.options.getEncryptionKey()
                                 , SimpleAuthEncryptMode.ENCRYPT);
                         //创建rememberMe cookie，并写入到response中
                         Cookie cookie = Cookie.cookie(this.options.getRememberMeCookieKey(),cookieValue)

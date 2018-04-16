@@ -118,6 +118,17 @@ SimpleAuthHandler authHandler = SimpleAuthHandler.create(this.vertx,myAuthProvid
  String JSESSIONID = routerContext.get(SimpleAuthConsts.JSESSIONID_KEY);
 </code></pre>
 
+5> 自定义SimpleAuthHandler实现来定义权限校验失败后的响应
+<pre><code>
+ //当前对于权限校验失败的默认响应如下：
+ //1.权限不足时：
+ ctx.response().setStatusCode(403).end("you have no permission to access '"+ctx.request().path()+"'");
+ //2.用户未登陆时：
+ ctx.response().setStatusCode(403).end("you need login first");
+ 
+ //如果希望自定义上述情况的响应，可以自定义一个Handler，继承AbstractSimpleAuthHandler类，实现handle方法（代码示例可以查看SimpleAuthHandlerImpl类）
+</code></pre>
+
 
 
 

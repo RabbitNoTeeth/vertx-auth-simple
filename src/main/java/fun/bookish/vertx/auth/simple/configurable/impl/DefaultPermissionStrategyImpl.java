@@ -1,5 +1,6 @@
-package fun.bookish.vertx.auth.simple.ext;
+package fun.bookish.vertx.auth.simple.configurable.impl;
 
+import fun.bookish.vertx.auth.simple.configurable.PermissionStrategy;
 import io.vertx.core.http.HttpServerRequest;
 
 /**

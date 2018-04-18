@@ -1,10 +1,8 @@
 package fun.bookish.vertx.auth.simple.core;
 
-import fun.bookish.vertx.auth.simple.config.SimpleAuthOptions;
+import fun.bookish.vertx.auth.simple.configurable.SessionIdStrategy;
+import fun.bookish.vertx.auth.simple.configurable.SessionPersistStrategy;
 import fun.bookish.vertx.auth.simple.constant.SimpleAuthConstants;
-import fun.bookish.vertx.auth.simple.encryption.SimpleAuthEncryptMode;
-import fun.bookish.vertx.auth.simple.encryption.SimpleAuthEncryption;
-import fun.bookish.vertx.auth.simple.manager.SecurityManager;
 import fun.bookish.vertx.auth.simple.provider.SimpleAuthProvider;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -12,68 +10,51 @@ import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.User;
-import io.vertx.ext.web.Cookie;
 import io.vertx.ext.web.RoutingContext;
 
-import java.time.LocalDateTime;
 
 /**
  *
  */
 public class Subject {
 
-    public final LocalDateTime time = LocalDateTime.now();
+    private String sessionId;
+    private Vertx vertx;
+    private SimpleAuthProvider authProvider;
+    private SessionPersistStrategy sessionPersistStrategy;
+    private SessionIdStrategy sessionIdStrategy;
 
-    private final String sessionID;
-    private final Vertx vertx;
-    private final SimpleAuthProvider authProvider;
-    private final SecurityManager securityManager;
-    private final SimpleAuthEncryption encryption;
-    private final SimpleAuthOptions options;
+    public Subject(){}
 
-    public Subject(String sessionID, Vertx vertx, SimpleAuthProvider authProvider, SecurityManager securityManager, SimpleAuthEncryption encryption, SimpleAuthOptions options){
-        this.sessionID = sessionID;
+    public Subject(String sessionID, Vertx vertx, SimpleAuthProvider authProvider, SimpleAuthOptions options){
+        this.sessionId = sessionID;
         this.vertx = vertx;
         this.authProvider = authProvider;
-        this.securityManager = securityManager;
-        this.encryption = encryption;
-        this.options = options;
+        this.sessionPersistStrategy = options.getSessionPersistStrategy();
+        this.sessionIdStrategy = options.getSessionIdStrategy();
     }
 
     private volatile User authUser;
 
-    private volatile boolean rememberMe;
-
     /**
      * 用户登录
-     * @param ctx
-     * @param authInfo
+     * @param ctx router上下文
+     * @param authInfo 用户信息
      * @param resultHandler
      */
     public void login(RoutingContext ctx, JsonObject authInfo, Handler<AsyncResult<Void>> resultHandler){
         this.vertx.executeBlocking(future -> authProvider.authenticate(authInfo, res -> {
             if(res.succeeded()){
-
-                User user = res.result();
-                this.authUser = user;
-
-                //判断rememberMe
-                Object rememberMe = authInfo.getValue(this.options.getRememberMeKey());
-                if(rememberMe != null){
-                    if(rememberMe.equals(true) || rememberMe.toString().equals("true")){
-                        this.rememberMe = true;
-                        //对user中的principle进行加密
-                        String cookieValue = this.encryption.encryptOrDecrypt(user.principal().toString(), this.options.getEncryptionKey()
-                                , SimpleAuthEncryptMode.ENCRYPT);
-                        //创建rememberMe cookie，并写入到response中
-                        Cookie cookie = Cookie.cookie(this.options.getRememberMeCookieKey(),cookieValue)
-                                .setMaxAge(this.options.getRememberMeTimeout())
-                                .setHttpOnly(false).setPath("/");
-                        ctx.addCookie(cookie);
-                        this.securityManager.cacheRememberMe(cookieValue,this);
-                    }
+                this.authUser = res.result();
+                ctx.session().put(SimpleAuthConstants.SUBJECT_KEY_IN_SESSION,this);
+                try{
+                    //持久化session
+                    sessionPersistStrategy.cache(ctx.session());
+                    //将sessionId写回到ctx中，具体如何操作由开发者实现
+                    sessionIdStrategy.writeSessionId(ctx);
+                }catch (Exception e){
+                    future.fail(e);
                 }
-
                 future.complete();
             }else{
                 future.fail(res.cause());
@@ -99,9 +80,10 @@ public class Subject {
      */
     public void logout(RoutingContext ctx){
         this.authUser = null;
-        this.rememberMe = false;
-        SecurityManager securityManager = ctx.vertx().getOrCreateContext().get(SimpleAuthConstants.VERTX_CTX_SECURITY_MANAGER_KEY);
-        securityManager.remove(ctx);
+        sessionPersistStrategy.remove(ctx.session());
+        ctx.session().remove(SimpleAuthConstants.SUBJECT_KEY_IN_SESSION);
+        ctx.setSession(null);
+        ctx.setUser(null);
     }
 
     public boolean isAuthenticated(){
@@ -112,20 +94,8 @@ public class Subject {
         return this.authUser;
     }
 
-    public boolean isRememberMe(){
-        return this.rememberMe;
-    }
-
-    public Subject setRememberMe(){
-        this.rememberMe = true;
-        return this;
-    }
-
     public JsonObject getPrincipal() {
-        return this.authUser==null?null : this.authUser.principal();
+        return this.authUser==null? null : this.authUser.principal();
     }
 
-    public String getSessionID() {
-        return sessionID;
-    }
 }

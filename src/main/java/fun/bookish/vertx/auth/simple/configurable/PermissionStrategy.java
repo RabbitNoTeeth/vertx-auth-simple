@@ -1,4 +1,4 @@
-package fun.bookish.vertx.auth.simple.ext;
+package fun.bookish.vertx.auth.simple.configurable;
 
 import io.vertx.core.http.HttpServerRequest;
 
@@ -17,7 +17,7 @@ public interface PermissionStrategy {
     /**
      * 校验请求与缓存的权限字符串
      * @param requestPermission 由http请求生成的请求权限字符串
-     * @param cachedPermission    SimpleAuthUser中缓存的权限字符串
+     * @param cachedPermission  SimpleAuthUser中缓存的权限字符串
      * @return  匹配成功返回true，说明权限认证成功
      *          否则返回false
      */

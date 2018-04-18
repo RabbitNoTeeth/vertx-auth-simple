@@ -1,7 +1,7 @@
-package fun.bookish.vertx.auth.simple.user;
+package fun.bookish.vertx.auth.simple.core;
 
-import fun.bookish.vertx.auth.simple.ext.PermissionStrategy;
-import fun.bookish.vertx.auth.simple.ext.DefaultPermissionStrategyImpl;
+import fun.bookish.vertx.auth.simple.configurable.PermissionStrategy;
+import fun.bookish.vertx.auth.simple.configurable.impl.DefaultPermissionStrategyImpl;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -12,7 +12,7 @@ import io.vertx.ext.auth.AuthProvider;
 import java.util.Collection;
 
 /**
- * io.vertx.ext.auth.User接口实现
+ * io.vertx.configurable.auth.User接口实现
  */
 public class SimpleAuthUser extends AbstractUser {
 
@@ -46,11 +46,11 @@ public class SimpleAuthUser extends AbstractUser {
         this.principal = principal;
     }
 
-    public void  appendPermission(String permission){
+    public void  addPermission(String permission){
         this.cachedPermissions.add(permission);
     }
 
-    public void  appendPermissions(Collection<String> permissions){
+    public void  addPermissions(Collection<String> permissions){
         this.cachedPermissions.addAll(permissions);
     }
 }

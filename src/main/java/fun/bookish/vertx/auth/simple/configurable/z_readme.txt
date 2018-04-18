@@ -1,0 +1,6 @@
+该package下定义了多个框架使用者可配置的接口，并且提供了默认实现。
+
+PermissionStrategy ：权限字符串生成及校验策略接口
+RealmStrategy ：校验结果处理策略接口
+SessionIdStrategy ：sessionId获取和写回策略接口
+SessionPersistStrategy ：session持久化策略接口

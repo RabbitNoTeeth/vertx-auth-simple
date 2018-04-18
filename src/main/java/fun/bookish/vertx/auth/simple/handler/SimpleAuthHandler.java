@@ -1,16 +1,13 @@
 package fun.bookish.vertx.auth.simple.handler;
 
 
-import fun.bookish.vertx.auth.simple.config.SimpleAuthOptions;
-import fun.bookish.vertx.auth.simple.ext.PermissionStrategy;
+import fun.bookish.vertx.auth.simple.core.SimpleAuthOptions;
 import fun.bookish.vertx.auth.simple.provider.SimpleAuthProvider;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
-import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 
 import java.util.Collection;
-import java.util.List;
 
 public interface SimpleAuthHandler extends Handler<RoutingContext> {
 
@@ -24,9 +21,8 @@ public interface SimpleAuthHandler extends Handler<RoutingContext> {
 
     boolean checkAnno(String permission);
 
-    void checkSessionId(RoutingContext ctx);
-
     SimpleAuthHandler addAnnoPermissions(Collection<String> permissions);
 
     SimpleAuthHandler addAnnoPermission(String permission);
+
 }

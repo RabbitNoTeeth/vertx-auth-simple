@@ -1,7 +1,6 @@
 package fun.bookish.vertx.auth.simple.util;
 
 import fun.bookish.vertx.auth.simple.constant.SimpleAuthConstants;
-import fun.bookish.vertx.auth.simple.core.SimpleAuthOptions;
 import fun.bookish.vertx.auth.simple.core.Subject;
 import io.vertx.ext.web.RoutingContext;
 

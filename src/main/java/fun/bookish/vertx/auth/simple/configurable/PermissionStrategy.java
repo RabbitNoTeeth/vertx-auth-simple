@@ -3,24 +3,23 @@ package fun.bookish.vertx.auth.simple.configurable;
 import io.vertx.core.http.HttpServerRequest;
 
 /**
- * 权限字符串策略接口
+ * 权限字符串生成及校验策略接口
  **/
 public interface PermissionStrategy {
 
     /**
-     * 根据http请求生成权限字符串
-     * @param request http请求
+     * 根据request请求生成权限字符串
+     * @param request
      * @return
      */
-    String create(HttpServerRequest request);
+    String generatePermission(HttpServerRequest request);
 
     /**
-     * 校验请求与缓存的权限字符串
-     * @param requestPermission 由http请求生成的请求权限字符串
-     * @param cachedPermission  SimpleAuthUser中缓存的权限字符串
-     * @return  匹配成功返回true，说明权限认证成功
-     *          否则返回false
+     * 校验权限字符串
+     * @param requestPermission 请求的权限字符串
+     * @param cachedPermission  User中缓存的权限字符串
+     * @return
      */
-    boolean match(String requestPermission,String cachedPermission);
+    boolean checkPermission(String requestPermission, String cachedPermission);
 
 }

@@ -11,9 +11,7 @@ import io.vertx.ext.auth.AuthProvider;
 
 import java.util.Collection;
 
-/**
- * io.vertx.configurable.auth.User接口实现
- */
+
 public class SimpleAuthUser extends AbstractUser {
 
     private final PermissionStrategy permissionStrategy;
@@ -30,7 +28,7 @@ public class SimpleAuthUser extends AbstractUser {
 
     @Override
     protected void doIsPermitted(String permission, Handler<AsyncResult<Boolean>> resultHandler) {
-        boolean access = this.cachedPermissions.stream().anyMatch(per -> this.permissionStrategy.match(permission,per));
+        boolean access = this.cachedPermissions.stream().anyMatch(per -> this.permissionStrategy.checkPermission(permission,per));
         resultHandler.handle(Future.succeededFuture(access));
     }
 

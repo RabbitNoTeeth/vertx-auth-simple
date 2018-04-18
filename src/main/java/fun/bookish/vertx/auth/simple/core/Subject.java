@@ -13,9 +13,7 @@ import io.vertx.ext.auth.User;
 import io.vertx.ext.web.RoutingContext;
 
 
-/**
- *
- */
+
 public class Subject {
 
     private String sessionId;
@@ -51,7 +49,7 @@ public class Subject {
                     //持久化session
                     sessionPersistStrategy.cache(ctx.session());
                     //将sessionId写回到ctx中，具体如何操作由开发者实现
-                    sessionIdStrategy.writeSessionId(ctx);
+                    sessionIdStrategy.writeSessionId(ctx.session().id(),ctx);
                 }catch (Exception e){
                     future.fail(e);
                 }

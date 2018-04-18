@@ -40,36 +40,32 @@ public class SimpleAuthHandlerImpl implements SimpleAuthHandler {
         this.sessionIdStrategy = options.getSessionIdStrategy();
         this.sessionPersistStrategy = options.getSessionPersistStrategy();
         this.realmStrategy = options.getRealmStrategy();
+        if(options.getAnnoPermissions() != null){
+            this.annoPermissionSet.addAll(options.getAnnoPermissions());
+        }
     }
 
 
-    /**
-     * 验证请求资源是否允许匿名访问
-     */
     @Override
     public final boolean checkAnno(String requestPermission) {
         return this.annoPermissionSet.contains("*") || this.annoPermissionSet.contains(requestPermission) ||
-                this.annoPermissionSet.stream().anyMatch(cachePermission -> permissionStrategy.match(requestPermission,cachePermission));
+                this.annoPermissionSet.stream().anyMatch(cachePermission -> permissionStrategy.checkPermission(requestPermission,cachePermission));
     }
 
 
-    /**
-     * 添加匿名访问许可
-     */
     @Override
     public final SimpleAuthHandler addAnnoPermissions(Collection<String> permissions) {
         this.annoPermissionSet.addAll(permissions);
         return this;
     }
 
-    /**
-     * 添加匿名访问许可
-     */
+
     @Override
     public final SimpleAuthHandler addAnnoPermission(String permission) {
         this.annoPermissionSet.add(permission);
         return this;
     }
+
 
     @Override
     public final void handle(RoutingContext ctx) {
@@ -84,7 +80,7 @@ public class SimpleAuthHandlerImpl implements SimpleAuthHandler {
         }
         ctx.setSession(session);
 
-        String permission = this.permissionStrategy.create(ctx.request());
+        String permission = this.permissionStrategy.generatePermission(ctx.request());
 
         if(ctx.request().method() == HttpMethod.OPTIONS || checkAnno(permission)){
             ctx.next();

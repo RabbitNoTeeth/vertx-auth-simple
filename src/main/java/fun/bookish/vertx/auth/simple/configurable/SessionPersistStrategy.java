@@ -1,5 +1,6 @@
 package fun.bookish.vertx.auth.simple.configurable;
 
+import fun.bookish.vertx.auth.simple.core.SimpleAuthOptions;
 import io.vertx.ext.web.Session;
 
 /**
@@ -27,8 +28,15 @@ public interface SessionPersistStrategy {
     void remove(Session session);
 
     /**
+     * 清除过期session
+     */
+    void clearExpired();
+
+    /**
      * 清空所有缓存的session
      */
     void clearAll();
+
+    SessionPersistStrategy setOptions(SimpleAuthOptions options);
 
 }

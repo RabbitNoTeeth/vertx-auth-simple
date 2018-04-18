@@ -16,6 +16,7 @@ import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.Session;
 import io.vertx.ext.web.sstore.impl.SessionImpl;
 
+import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -34,6 +35,7 @@ public class SimpleAuthHandlerImpl implements SimpleAuthHandler {
 
     SimpleAuthHandlerImpl(Vertx vertx,SimpleAuthProvider simpleAuthProvider,SimpleAuthOptions options){
         this.vertx = vertx;
+        options.setVertx(vertx);
         this.simpleAuthProvider = simpleAuthProvider;
         this.options = options;
         this.permissionStrategy = options.getPermissionStrategy();
@@ -66,14 +68,14 @@ public class SimpleAuthHandlerImpl implements SimpleAuthHandler {
         return this;
     }
 
-
     @Override
     public final void handle(RoutingContext ctx) {
 
         String sessionId = sessionIdStrategy.getSessionId(ctx);
         Session session = sessionPersistStrategy.get(sessionId);
         if(session == null){
-            Session newSession = new SessionImpl(new PRNG(this.vertx),1200000L,8);
+            Session newSession = new SessionImpl(new PRNG(this.vertx),this.options.getSessionTimeout()*1000,8);
+            newSession.put(SimpleAuthConstants.SESSION_CREATE_TIME_KEY, LocalDateTime.now());
             newSession.put(SimpleAuthConstants.SUBJECT_KEY_IN_SESSION,new Subject(newSession.id(),this.vertx,this.simpleAuthProvider,this.options));
             sessionPersistStrategy.cache(newSession);
             session = newSession;

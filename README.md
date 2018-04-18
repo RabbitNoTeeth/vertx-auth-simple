@@ -40,15 +40,15 @@ public class MyAuthProviderImpl implements SimpleAuthProvider {
 2.配置router（config the Router）
 
 <pre><code>
+// 创建配置类
+SimpleAuthOptions options = new SimpleAuthOptions();
 // 定义不需要拦截的访问
 List<String> annoPermissions = listOf("GET:/articles/page","GET:/articleClassifies/tree")
-
-// 创建实现类
-MyAuthProviderImpl myAuthProviderImpl = new myAuthProviderImpl()
+options.setAnnoPermissions(annoPermissions);
 
 // 创建并注册权限处理器
-SimpleAuthHandler authHandler = SimpleAuthHandler.create(this.vertx,myAuthProviderImpl);
-authHandler.addAnnoPermissions(annoPermissions)
+SimpleAuthHandler authHandler = SimpleAuthHandler.create(this.vertx,new myAuthProviderImpl(),options);
+
 router.route().handler(authHandler);
 </code></pre>
 
@@ -56,8 +56,7 @@ router.route().handler(authHandler);
 3.获取Subject实体（get the subject of user）<br>
 
 <pre><code>
-//从RoterContext上下文中获取(SimpleAuthHandler会在拦截请求后将当前会话的subject放到RoterContext上下文中)
-Subject subject = ctx.get(SimpleConstants.CTX_SUBJECT_KEY)
+Subject subject = SubjectUtil.getSubject(routingContext);
 </code></pre>
 
 <br><br><br>
@@ -68,65 +67,40 @@ Subject subject = ctx.get(SimpleConstants.CTX_SUBJECT_KEY)
 
 <br><br><br>
 5.扩展功能<br>
+下面所有扩展接口在vertx-auth-simple中都提供了默认实现（可零配置开箱即用），可以根据场景需要来自定义各个接口实现
 
-1> 自定义权限字符串的生成格式和校验规则
+1> 实现PermissionStrategy接口，自定义权限字符串的生成格式和校验规则
 
 <pre><code>
-//首先，提供PermissionStrategy接口的实现
-public class MyPermissionStrategy implements PermissionStrategy{
-    @Override
-    public String create(HttpServerRequest request){ //自定义权限字符串生成格式并返回 }
-    @Override
-    public boolean match(String requestPermission,String cachedPermission){ //自定义权限字符串的校验规则 }
-}
 SimpleAuthOptions options = new SimpleAuthOptions();
-options.setPermissionStrategy(new MyPermissionStrategy());
-//然后在创建权限拦截器时，传入自定义的权限字符串策略
-SimpleAuthHandler authHandler = SimpleAuthHandler.create(this.vertx,myAuthProviderImpl,options);
+options.setPermissionStrategy(new MyPermissionStrategyImpl());
 </code></pre>
 
-2> 自定义session会话过期时间、rememberMe cookie的过期时间和加密密钥
+2> 实现SessionIdStrategy接口，自定义sessionId处理策略
 
 <pre><code>
  SimpleAuthOptions options = new SimpleAuthOptions();
- options.setSessionTimeout(3600*30); //时间单位为s
- options.setRememberMeTimeout(3600*24*30);  //时间单位为s
- options.setEncryptionKey("自定义的rememberme cookie加密密钥");
- SimpleAuthHandler authHandler = SimpleAuthHandler.create(this.vertx,myAuthProviderImpl,options);
+ options.setSessionIdStrategy(new MySessionIdStrategyImpl());
 </code></pre>
 
-3> 自定义rememberMe cookie加密方式
+3> 实现SessionPersistStrategy接口，自定义session持久化方式
 
 <pre><code>
- 
- public class MySimpleAuthEncryption implements SimpleAuthEncryption{
-    @Override
-    public String encryptOrDecrypt(String data,String key,SimpleAuthEncryptMode mode){
-        //...
-    }
- }
- 
  SimpleAuthOptions options = new SimpleAuthOptions();
- options.setSimpleEncryption(new MySimpleAuthEncryption());
- SimpleAuthHandler authHandler = SimpleAuthHandler.create(this.vertx,myAuthProviderImpl,options);
+ options.setSessionPersistStrategy(new MySessionPersistStrategyImpl());
 </code></pre>
 
-4> 如果浏览器端禁用了cookie，那么可以从RouterContext中获取到JSESSIONID，便于子路由通过响应
-将JSESSIONID传给浏览器
+4> 实现RememberMePersistStrategy接口，自定义rememberMe信息的持久化方式
 
 <pre><code>
- String JSESSIONID = routerContext.get(SimpleAuthConsts.JSESSIONID_KEY);
+ SimpleAuthOptions options = new SimpleAuthOptions();
+ options.setRememberMePersistStrategy(new MyRememberMePersistStrategyImpl());
 </code></pre>
 
-5> 自定义SimpleAuthHandler实现来定义权限校验失败后的响应
+5> 实现RealmStrategy接口，自定义权限验证成功或者失败后的处理动作
 <pre><code>
- //当前对于权限校验失败的默认响应如下：
- //1.权限不足时：
- ctx.response().setStatusCode(403).end("you have no permission to access '"+ctx.request().path()+"'");
- //2.用户未登陆时：
- ctx.response().setStatusCode(403).end("you need login first");
- 
- //如果希望自定义上述情况的响应，可以自定义一个Handler，继承AbstractSimpleAuthHandler类，实现handle方法（代码示例可以查看SimpleAuthHandlerImpl类）
+  SimpleAuthOptions options = new SimpleAuthOptions();
+  options.setRealmStrategy(new MyRealmStrategyImpl());
 </code></pre>
 
 

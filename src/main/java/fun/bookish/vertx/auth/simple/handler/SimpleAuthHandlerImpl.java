@@ -78,6 +78,8 @@ public class SimpleAuthHandlerImpl implements SimpleAuthHandler {
             newSession.put(SimpleAuthConstants.SESSION_CREATE_TIME_KEY, LocalDateTime.now());
             newSession.put(SimpleAuthConstants.SUBJECT_KEY_IN_SESSION,new Subject(newSession.id(),this.vertx,this.simpleAuthProvider,this.options));
             sessionPersistStrategy.cache(newSession);
+            //将sessionId写回到ctx中，具体如何操作由开发者实现
+            sessionIdStrategy.writeSessionId(newSession.id(),ctx);
             session = newSession;
         }
         ctx.setSession(session);

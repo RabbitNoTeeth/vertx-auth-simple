@@ -63,8 +63,6 @@ public class Subject {
                         rememberMePersistStrategy.cache(cookie,ctx.session());
                         ctx.addCookie(cookie);
                     }
-                    //将sessionId写回到ctx中，具体如何操作由开发者实现
-                    sessionIdStrategy.writeSessionId(ctx.session().id(),ctx);
                 }catch (Exception e){
                     future.fail(e);
                 }
@@ -114,8 +112,9 @@ public class Subject {
         return this.authUserRef.get()==null? null : this.authUserRef.get().principal();
     }
 
-    public void enableRememberMe(boolean state){
+    public Subject enableRememberMe(boolean state){
         this.rememberMeRef.set(state);
+        return this;
     }
 
 }

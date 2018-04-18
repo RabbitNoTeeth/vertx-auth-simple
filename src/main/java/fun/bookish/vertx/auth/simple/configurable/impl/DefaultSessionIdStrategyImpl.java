@@ -12,7 +12,7 @@ public class DefaultSessionIdStrategyImpl implements SessionIdStrategy{
 
     @Override
     public String getSessionId(RoutingContext context) {
-        return context.getCookie("JSESSIONID").getValue();
+        return context.getCookie("JSESSIONID") == null? null : context.getCookie("JSESSIONID").getValue();
     }
 
     @Override

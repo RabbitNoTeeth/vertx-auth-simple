@@ -1,6 +1,7 @@
 package fun.bookish.vertx.auth.simple.core;
 
 import fun.bookish.vertx.auth.simple.configurable.*;
+import fun.bookish.vertx.auth.simple.configurable.impl.DefaultRememberMePersistStrategyImpl;
 import fun.bookish.vertx.auth.simple.configurable.impl.DefaultSessionPersistStrategyImpl;
 import fun.bookish.vertx.auth.simple.constant.SimpleAuthConstants;
 import io.vertx.core.Vertx;
@@ -16,7 +17,7 @@ public class SimpleAuthOptions {
     private PermissionStrategy permissionStrategy = SimpleAuthConstants.DEFAULT_PERMISSION_STRATEGY_IMPL;
     private SessionIdStrategy sessionIdStrategy = SimpleAuthConstants.DEFAULT_SESSION_ID_STRATEGY_IMPL;
     private SessionPersistStrategy sessionPersistStrategy = new DefaultSessionPersistStrategyImpl().setOptions(this);
-    private RememberMePersistStrategy rememberMePersistStrategy;
+    private RememberMePersistStrategy rememberMePersistStrategy = new DefaultRememberMePersistStrategyImpl().setOptions(this);
     private RealmStrategy realmStrategy = SimpleAuthConstants.DEFAULT_REALM_STRATEGY_IMPL;
     private Long sessionTimeout = SimpleAuthConstants.DEFAULT_SESSION_TIMEOUT;
     private Long rememberMeTimeout = SimpleAuthConstants.DEFAULT_REMEMBER_ME_TIMEOUT;

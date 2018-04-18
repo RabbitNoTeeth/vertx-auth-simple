@@ -31,7 +31,7 @@ public class DefaultSessionPersistStrategyImpl implements SessionPersistStrategy
     @Override
     public Session get(String sessionId) {
         checkClearExpiredTask();
-        return SESSION_CACHE.get(sessionId);
+        return sessionId == null ? null : SESSION_CACHE.get(sessionId);
     }
 
     @Override

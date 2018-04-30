@@ -11,6 +11,8 @@ import fun.bookish.vertx.auth.simple.provider.SimpleAuthProvider;
 import fun.bookish.vertx.auth.simple.util.SubjectUtil;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpMethod;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.auth.PRNG;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.Session;
@@ -22,6 +24,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class SimpleAuthHandlerImpl implements SimpleAuthHandler {
+
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private Vertx vertx;
     private SimpleAuthProvider simpleAuthProvider;
@@ -87,19 +91,24 @@ public class SimpleAuthHandlerImpl implements SimpleAuthHandler {
         String permission = this.permissionStrategy.generatePermission(ctx.request());
 
         if(ctx.request().method() == HttpMethod.OPTIONS || checkAnno(permission)){
+            logger.info("拦截请求：" + permission + ", 允许匿名：是");
             ctx.next();
         }else{
             Subject subject = SubjectUtil.getSubject(ctx);
             if(subject.isAuthenticated()){
+                Session finalSession = session;
                 subject.isAuthorised(permission, res -> {
                     if(res.succeeded() && res.result()){
+                        logger.info("拦截请求：" + permission + ", 允许匿名：否， 当前session：" + finalSession.id() + ", 校验结果：允许访问");
                         realmStrategy.afterAuthorisedSucceed(ctx);
                         ctx.next();
                     }else{
+                        logger.info("拦截请求：" + permission + ", 允许匿名：否， 当前session：" + finalSession.id() + ", 校验结果：用户权限不足，不允许访问");
                         realmStrategy.handleAuthorisedFailed(ctx);
                     }
                 });
             }else{
+                logger.info("拦截请求：" + permission + ", 允许匿名：否， 当前session：" + session.id() + ", 校验结果：用户未登录，不允许访问");
                 realmStrategy.handleAuthenticatedFailed(ctx);
             }
         }

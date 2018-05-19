@@ -75,43 +75,61 @@ public class SimpleAuthHandlerImpl implements SimpleAuthHandler {
     @Override
     public final void handle(RoutingContext ctx) {
 
-        String sessionId = sessionIdStrategy.getSessionId(ctx);
-        Session session = sessionPersistStrategy.get(sessionId);
-        if(session == null){
-            Session newSession = new SessionImpl(new PRNG(this.vertx),this.options.getSessionTimeout()*1000,8);
-            newSession.put(SimpleAuthConstants.SESSION_CREATE_TIME_KEY, LocalDateTime.now());
-            newSession.put(SimpleAuthConstants.SUBJECT_KEY_IN_SESSION,new Subject(newSession.id(),this.vertx,this.simpleAuthProvider,this.options));
-            sessionPersistStrategy.cache(newSession);
-            //将sessionId写回到ctx中，具体如何操作由开发者实现
-            sessionIdStrategy.writeSessionId(newSession.id(),ctx);
-            session = newSession;
-        }
-        ctx.setSession(session);
-
         String permission = this.permissionStrategy.generatePermission(ctx.request());
 
-        if(ctx.request().method() == HttpMethod.OPTIONS || checkAnno(permission)){
-            logger.info("拦截请求：" + permission + ", 允许匿名：是");
+        if(ctx.request().method() == HttpMethod.OPTIONS){
             ctx.next();
         }else{
-            Subject subject = SubjectUtil.getSubject(ctx);
-            if(subject.isAuthenticated()){
-                Session finalSession = session;
-                subject.isAuthorised(permission, res -> {
-                    if(res.succeeded() && res.result()){
-                        logger.info("拦截请求：" + permission + ", 允许匿名：否， 当前session：" + finalSession.id() + ", 校验结果：允许访问");
-                        realmStrategy.afterAuthorisedSucceed(ctx);
-                        ctx.next();
-                    }else{
-                        logger.info("拦截请求：" + permission + ", 允许匿名：否， 当前session：" + finalSession.id() + ", 校验结果：用户权限不足，不允许访问");
-                        realmStrategy.handleAuthorisedFailed(ctx);
-                    }
-                });
+            String sessionId = checkSession(ctx);
+            if(checkAnno(permission)){
+                logger.info("拦截请求：" + permission + ", 允许匿名：是");
+                ctx.next();
             }else{
-                logger.info("拦截请求：" + permission + ", 允许匿名：否， 当前session：" + session.id() + ", 校验结果：用户未登录，不允许访问");
-                realmStrategy.handleAuthenticatedFailed(ctx);
+                Subject subject = SubjectUtil.getSubject(ctx);
+                if(subject.isAuthenticated()){
+                    subject.isAuthorised(permission, res -> {
+                        if(res.succeeded() && res.result()){
+                            logger.info("拦截请求：" + permission + ", 允许匿名：否， 当前session：" + sessionId + ", 校验结果：允许访问");
+                            realmStrategy.afterAuthorisedSucceed(ctx);
+                            ctx.next();
+                        }else{
+                            logger.info("拦截请求：" + permission + ", 允许匿名：否， 当前session：" + sessionId + ", 校验结果：用户权限不足，不允许访问");
+                            realmStrategy.handleAuthorisedFailed(ctx);
+                        }
+                    });
+                }else{
+                    logger.info("拦截请求：" + permission + ", 允许匿名：否， 当前session：" + sessionId + "校验结果：用户未登录，不允许访问");
+                    realmStrategy.handleAuthenticatedFailed(ctx);
+                }
             }
         }
+    }
+
+    private String checkSession(RoutingContext ctx) {
+        String sessionId = sessionIdStrategy.getSessionId(ctx);
+        Session session;
+        if(sessionId == null){
+            session = createSession();
+            sessionIdStrategy.writeSessionId(session.id(),ctx);
+            sessionId = session.id();
+        }else{
+            session = sessionPersistStrategy.get(sessionId);
+            if(session == null){
+                session = createSession();
+                sessionIdStrategy.writeSessionId(session.id(),ctx);
+                sessionId = session.id();
+            }
+        }
+        ctx.setSession(session);
+        return sessionId;
+    }
+
+    private Session createSession(){
+        Session session = new SessionImpl(new PRNG(this.vertx),this.options.getSessionTimeout()*1000,8);
+        session.put(SimpleAuthConstants.SESSION_CREATE_TIME_KEY, LocalDateTime.now());
+        session.put(SimpleAuthConstants.SUBJECT_KEY_IN_SESSION,new Subject(session.id(),this.vertx,this.simpleAuthProvider,this.options));
+        sessionPersistStrategy.cache(session);
+        return session;
     }
 
 }

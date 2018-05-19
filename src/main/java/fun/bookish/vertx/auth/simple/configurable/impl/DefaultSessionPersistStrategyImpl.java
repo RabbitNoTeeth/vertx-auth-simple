@@ -18,9 +18,9 @@ public class DefaultSessionPersistStrategyImpl implements SessionPersistStrategy
 
     private SimpleAuthOptions options;
 
-    private final ConcurrentHashMap<String,Session> SESSION_CACHE = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String,Session> SESSION_CACHE = new ConcurrentHashMap<>();
 
-    private AtomicBoolean clearExpiredTaskStarted = new AtomicBoolean(false);
+    private static final AtomicBoolean CLEAR_EXPIRED_TASK_STARTED = new AtomicBoolean(false);
 
     @Override
     public void cache(Session session) {
@@ -59,7 +59,7 @@ public class DefaultSessionPersistStrategyImpl implements SessionPersistStrategy
     }
 
     private void checkClearExpiredTask(){
-        if(!clearExpiredTaskStarted.get()){
+        if(!CLEAR_EXPIRED_TASK_STARTED.get()){
             Long sessionTimeout = this.options.getSessionTimeout();
             this.options.getVertx().setPeriodic(sessionTimeout*1000, id -> {
                 clearExpiredSession(sessionTimeout);

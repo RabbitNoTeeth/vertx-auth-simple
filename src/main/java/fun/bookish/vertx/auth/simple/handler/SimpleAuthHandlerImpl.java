@@ -11,12 +11,12 @@ import fun.bookish.vertx.auth.simple.provider.SimpleAuthProvider;
 import fun.bookish.vertx.auth.simple.util.SubjectUtil;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpMethod;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
 import io.vertx.ext.auth.PRNG;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.Session;
 import io.vertx.ext.web.sstore.impl.SessionImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.Collection;
@@ -25,7 +25,7 @@ import java.util.Set;
 
 public class SimpleAuthHandlerImpl implements SimpleAuthHandler {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final Logger logger = LoggerFactory.getLogger(SimpleAuthHandlerImpl.class);
 
     private Vertx vertx;
     private SimpleAuthProvider simpleAuthProvider;

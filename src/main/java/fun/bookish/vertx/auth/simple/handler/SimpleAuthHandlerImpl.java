@@ -1,17 +1,15 @@
 package fun.bookish.vertx.auth.simple.handler;
 
-import fun.bookish.vertx.auth.simple.configurable.RealmStrategy;
-import fun.bookish.vertx.auth.simple.configurable.SessionIdStrategy;
-import fun.bookish.vertx.auth.simple.configurable.SessionPersistStrategy;
+import fun.bookish.vertx.auth.simple.configurable.*;
 import fun.bookish.vertx.auth.simple.core.SimpleAuthOptions;
 import fun.bookish.vertx.auth.simple.constant.SimpleAuthConstants;
 import fun.bookish.vertx.auth.simple.core.Subject;
-import fun.bookish.vertx.auth.simple.configurable.PermissionStrategy;
 import fun.bookish.vertx.auth.simple.provider.SimpleAuthProvider;
 import fun.bookish.vertx.auth.simple.util.SubjectUtil;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.auth.PRNG;
+import io.vertx.ext.web.Cookie;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.Session;
 import io.vertx.ext.web.sstore.impl.SessionImpl;
@@ -33,6 +31,7 @@ public class SimpleAuthHandlerImpl implements SimpleAuthHandler {
     private PermissionStrategy permissionStrategy;
     private SessionIdStrategy sessionIdStrategy;
     private SessionPersistStrategy sessionPersistStrategy;
+    private RememberMePersistStrategy rememberMePersistStrategy;
     private RealmStrategy realmStrategy;
 
     private final Set<String> annoPermissionSet = new HashSet<>();
@@ -45,6 +44,7 @@ public class SimpleAuthHandlerImpl implements SimpleAuthHandler {
         this.permissionStrategy = options.getPermissionStrategy();
         this.sessionIdStrategy = options.getSessionIdStrategy();
         this.sessionPersistStrategy = options.getSessionPersistStrategy();
+        this.rememberMePersistStrategy = options.getRememberMePersistStrategy();
         this.realmStrategy = options.getRealmStrategy();
         if(options.getAnnoPermissions() != null){
             this.annoPermissionSet.addAll(options.getAnnoPermissions());
@@ -106,6 +106,18 @@ public class SimpleAuthHandlerImpl implements SimpleAuthHandler {
     }
 
     private String checkSession(RoutingContext ctx) {
+        Cookie rememberMe = ctx.getCookie("RememberMe");
+        if(rememberMe != null){
+            Session session = rememberMePersistStrategy.get(rememberMe);
+            if(session != null){
+                ctx.setSession(session);
+                if(sessionIdStrategy.getSessionId(ctx) == null){
+                    sessionIdStrategy.writeSessionId(session.id(),ctx);
+                }
+                return session.id();
+            }
+        }
+
         String sessionId = sessionIdStrategy.getSessionId(ctx);
         Session session;
         if(sessionId == null){
@@ -122,6 +134,7 @@ public class SimpleAuthHandlerImpl implements SimpleAuthHandler {
         }
         ctx.setSession(session);
         return sessionId;
+
     }
 
     private Session createSession(){

@@ -20,7 +20,7 @@ public class DefaultRememberMePersistStrategyImpl implements RememberMePersistSt
 
     private SimpleAuthOptions options;
 
-    private final ConcurrentHashMap<String,Session> SESSION_CACHE = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String,Session> SESSION_CACHE = new ConcurrentHashMap<>();
 
     private AtomicBoolean clearExpiredTaskStarted = new AtomicBoolean(false);
 

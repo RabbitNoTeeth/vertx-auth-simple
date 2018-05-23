@@ -90,9 +90,8 @@ public class Subject {
     public void logout(RoutingContext ctx){
 
         this.authUserRef.set(null);
-
         ctx.setUser(null);
-
+        sessionPersistStrategy.remove(ctx.session());
         Cookie rememberMeCookie = ctx.removeCookie("RememberMe");
         if(rememberMeCookie != null){
             rememberMePersistStrategy.remove(rememberMeCookie);

@@ -53,7 +53,22 @@ router.route().handler(authHandler);
 </code></pre>
 
 <br><br><br>
-3.获取Subject实体（get the subject of user）<br>
+3.用户登录（user login）<br>
+
+<pre><code>
+Subject subject = SubjectUtil.getSubject(routingContext);
+subject.login(context,params, res -> {
+    if(res.succeeded()){
+        context.response().write(...);
+    }else{
+        context.response().write(...);
+    }
+    context.end();
+});
+</code></pre>
+
+<br><br><br>
+4.获取Subject实体（get the subject of user）<br>
 
 <pre><code>
 Subject subject = SubjectUtil.getSubject(routingContext);

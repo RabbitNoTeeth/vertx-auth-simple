@@ -15,7 +15,18 @@ public class DefaultPermissionStrategyImpl implements PermissionStrategy {
 
     @Override
     public boolean checkPermission(String request, String cached){
-        return  cached.equals("*") || request.startsWith(cached.replaceAll("\\*", ""));
+        return cached.equals("*") ||
+                request.equals(cached) ||
+                request.contains(".html") ||
+                request.contains(".css") ||
+                request.contains(".json") ||
+                request.contains(".text") ||
+                request.contains(".js") ||
+                request.contains(".woff") ||
+                request.contains(".svg") ||
+                request.contains(".ttf") ||
+                request.contains(".ico") ||
+                request.contains(".png");
     }
 
 }

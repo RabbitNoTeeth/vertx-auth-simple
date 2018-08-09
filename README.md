@@ -76,10 +76,9 @@ Subject subject = SubjectUtil.getSubject(routingContext);
 
 <br><br><br>
 4.注意<br>
-在vertx-auth-simple中,默认的权限字符串生成格式为 "请求方法:请求地址",如 "GET:/articles/page" <br>
-默认的权限字符串校验支持最后一位\*号匹配,如 GET:/article/123456 和 GET:/article/456789 分别表示请求不同的资源,
-那么可以通过 GET:/article/* 或者 GET:/article 来同时匹配两者 <br>单纯一个*号表示匹配所有访问<br>
-
+在vertx-auth-simple中,默认的权限字符串生成格式为 "请求方法:请求地址",如 "GET:/articles/page" ,<br>
+同时,默认的权限字符串处理策略对静态资源文件进行了处理,允许访问静态资源(具体实现可查看DefaultPermissionStrategyImpl.class) ,<br>
+所以可以放心地将SimpleAuthHandler声明在静态资源处理器StaticHandler之前
 <br><br><br>
 5.扩展功能<br>
 下面所有扩展接口在vertx-auth-simple中都提供了默认实现（可零配置开箱即用），可以根据场景需要来自定义各个接口实现

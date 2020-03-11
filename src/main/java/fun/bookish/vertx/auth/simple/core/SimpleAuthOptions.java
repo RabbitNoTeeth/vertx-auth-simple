@@ -21,7 +21,6 @@ public class SimpleAuthOptions {
     private RealmStrategy realmStrategy = SimpleAuthConstants.DEFAULT_REALM_STRATEGY_IMPL;
     private Long sessionTimeout = SimpleAuthConstants.DEFAULT_SESSION_TIMEOUT;
     private Long rememberMeTimeout = SimpleAuthConstants.DEFAULT_REMEMBER_ME_TIMEOUT;
-    private List<String> annoPermissions;
 
     public PermissionStrategy getPermissionStrategy() {
         return permissionStrategy;
@@ -68,15 +67,6 @@ public class SimpleAuthOptions {
             throw new IllegalArgumentException("realmStrategy can not be null");
         }
         this.realmStrategy = realmStrategy;
-        return this;
-    }
-
-    public List<String> getAnnoPermissions() {
-        return annoPermissions;
-    }
-
-    public SimpleAuthOptions setAnnoPermissions(List<String> annoPermissions) {
-        this.annoPermissions = annoPermissions;
         return this;
     }
 

@@ -19,10 +19,4 @@ public interface SimpleAuthHandler extends Handler<RoutingContext> {
         return new SimpleAuthHandlerImpl(vertx,simpleAuthProvider,options);
     }
 
-    boolean checkAnno(String permission);
-
-    SimpleAuthHandler addAnnoPermissions(Collection<String> permissions);
-
-    SimpleAuthHandler addAnnoPermission(String permission);
-
 }

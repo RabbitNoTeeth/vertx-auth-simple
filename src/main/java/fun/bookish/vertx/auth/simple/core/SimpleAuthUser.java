@@ -16,11 +16,11 @@ public class SimpleAuthUser extends AbstractUser {
 
     private final PermissionStrategy permissionStrategy;
 
-    public SimpleAuthUser(){
+    public SimpleAuthUser() {
         this.permissionStrategy = new DefaultPermissionStrategyImpl();
     }
 
-    public SimpleAuthUser(PermissionStrategy permissionStrategy){
+    public SimpleAuthUser(PermissionStrategy permissionStrategy) {
         this.permissionStrategy = permissionStrategy;
     }
 
@@ -28,7 +28,7 @@ public class SimpleAuthUser extends AbstractUser {
 
     @Override
     protected void doIsPermitted(String permission, Handler<AsyncResult<Boolean>> resultHandler) {
-        boolean access = this.cachedPermissions.stream().anyMatch(per -> this.permissionStrategy.checkPermission(permission,per));
+        boolean access = this.permissionStrategy.checkPermission(permission, this.cachedPermissions);
         resultHandler.handle(Future.succeededFuture(access));
     }
 
@@ -38,17 +38,18 @@ public class SimpleAuthUser extends AbstractUser {
     }
 
     @Override
-    public void setAuthProvider(AuthProvider authProvider) { }
+    public void setAuthProvider(AuthProvider authProvider) {
+    }
 
-    public void setPrincipal(JsonObject principal){
+    public void setPrincipal(JsonObject principal) {
         this.principal = principal;
     }
 
-    public void  addPermission(String permission){
+    public void addPermission(String permission) {
         this.cachedPermissions.add(permission);
     }
 
-    public void  addPermissions(Collection<String> permissions){
+    public void addPermissions(Collection<String> permissions) {
         this.cachedPermissions.addAll(permissions);
     }
 }

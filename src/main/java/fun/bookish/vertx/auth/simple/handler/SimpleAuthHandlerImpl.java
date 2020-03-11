@@ -34,8 +34,6 @@ public class SimpleAuthHandlerImpl implements SimpleAuthHandler {
     private RememberMePersistStrategy rememberMePersistStrategy;
     private RealmStrategy realmStrategy;
 
-    private final Set<String> annoPermissionSet = new HashSet<>();
-
     SimpleAuthHandlerImpl(Vertx vertx,SimpleAuthProvider simpleAuthProvider,SimpleAuthOptions options){
         this.vertx = vertx;
         options.setVertx(vertx);
@@ -46,30 +44,6 @@ public class SimpleAuthHandlerImpl implements SimpleAuthHandler {
         this.sessionPersistStrategy = options.getSessionPersistStrategy();
         this.rememberMePersistStrategy = options.getRememberMePersistStrategy();
         this.realmStrategy = options.getRealmStrategy();
-        if(options.getAnnoPermissions() != null){
-            this.annoPermissionSet.addAll(options.getAnnoPermissions());
-        }
-    }
-
-
-    @Override
-    public final boolean checkAnno(String requestPermission) {
-        return this.annoPermissionSet.contains("*") || this.annoPermissionSet.contains(requestPermission) ||
-                this.annoPermissionSet.stream().anyMatch(cachePermission -> permissionStrategy.checkPermission(requestPermission,cachePermission));
-    }
-
-
-    @Override
-    public final SimpleAuthHandler addAnnoPermissions(Collection<String> permissions) {
-        this.annoPermissionSet.addAll(permissions);
-        return this;
-    }
-
-
-    @Override
-    public final SimpleAuthHandler addAnnoPermission(String permission) {
-        this.annoPermissionSet.add(permission);
-        return this;
     }
 
     @Override
@@ -81,7 +55,7 @@ public class SimpleAuthHandlerImpl implements SimpleAuthHandler {
             ctx.next();
         }else{
             String sessionId = checkSession(ctx);
-            if(checkAnno(permission)){
+            if(permissionStrategy.checkIfAnonymous(permission)){
                 logger.info("拦截请求：" + permission + ", 允许匿名：是");
                 ctx.next();
             }else{
